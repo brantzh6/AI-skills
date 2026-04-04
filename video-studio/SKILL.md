@@ -1,6 +1,6 @@
 ---
 name: video-studio
-description: AI video generation with Alibaba Cloud Wan 2.6/2.7. Text-to-video, image-to-video, reference video generation, and more.
+description: AI video generation with Alibaba Cloud Wan 2.6/2.7. Text-to-video, image-to-video (first frame, first+last frame), reference video generation with multi-character, multi-shot support.
 ---
 
 # Video Studio 🎬
@@ -11,82 +11,125 @@ AI video generation powered by Alibaba Cloud Wan 2.6/2.7 models.
 
 | Mode | Model | Description |
 |------|-------|-------------|
-| **Text-to-Video** | wan2.7-t2v / wan2.6-t2v | Generate video from text prompt |
-| **Image-to-Video (First Frame)** | wan2.6-i2v | First frame image → video |
-| **Image-to-Video (First+Last)** | wan2.6-i2v | First + last frame → controlled video |
-| **Reference Video** | wan2.6-r2v | Reference video style → new video |
+| **Text-to-Video** | wan2.7-t2v, wan2.6-t2v | Generate video from text prompt |
+| **Image-to-Video** | wan2.6-i2v | First frame or first+last frame → video |
+| **Reference-to-Video** | wan2.7-r2v, wan2.6-r2v | Multiple reference images/videos → multi-character video |
 
 ## Usage
 
 ### Text to Video
 ```
 /video <prompt>
-/video A cat walking in a garden, cinematic lighting
-/video 一只小猫在月光下奔跑
+/video A cat walking in a garden, cinematic lighting --duration 10 --resolution 720P
 ```
 
-### Image to Video (First Frame)
+### Image to Video
 ```
-/video --mode i2v --image <image_path> <prompt>
+# First frame only
+/video --mode i2v --image <first_frame.jpg> <prompt>
+
+# First + Last frame (controlled transition)
+/video --mode i2v --first <start.jpg> --last <end.jpg> <prompt>
 ```
 
-### Image to Video (First + Last Frame)
+### Reference to Video (Multi-character, Multi-shot)
 ```
-/video --mode i2v --first <first_frame> --last <last_frame> <prompt>
-```
+# Single character reference (video)
+/video --mode r2v --ref <character_video.mp4> <prompt>
+  → Use "character1" or "参考视频" in prompt
 
-### Reference Video Generation
-```
-/video --mode r2v --ref <reference_video> <prompt>
-```
+# Single character reference (image)
+/video --mode r2v --ref <character.jpg> <prompt>
+  → Use "图1" or "参考图片" in prompt
 
-### Advanced Options
-```
-/video <prompt> --duration 10 --resolution 720P --ratio 16:9 --seed 42
-/video <prompt> --model wan2.6-t2v --negative "blurry, low quality"
+# Multi-character interaction (up to 3 videos + 2 images = 5 total)
+/video --mode r2v \
+  --ref <char1.mp4> --ref <char2.mp4> --ref <prop.jpg> \
+  "视频1抱着图3在咖啡厅弹奏民谣，视频2笑着看着视频1"
+
+# Multi-shot storytelling with storyboard image
+/video --mode r2v --ref <storyboard.png> <prompt>
+  → Describe storyboard panels in prompt (panel 1, panel 2, etc.)
+
+# With first frame control
+/video --mode r2v \
+  --ref <char1.mp4> --ref <char2.mp4> \
+  --first-frame <opening_scene.jpg> \
+  "视频1和图1在花园里对话"
 ```
 
 ## Parameters
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `--mode` | Mode: t2v, i2v, r2v | t2v |
-| `--model` | Model: wan2.7-t2v, wan2.6-t2v, wan2.6-i2v, wan2.6-r2v | wan2.6-t2v |
-| `--image` | Input image for i2v mode (first frame) | - |
-| `--first` | First frame image for i2v | - |
-| `--last` | Last frame image for i2v | - |
-| `--ref` | Reference video for r2v mode | - |
-| `--duration` | Video duration in seconds (2-15) | 5 |
-| `--resolution` | Resolution: 480P, 720P, 1080P | 720P |
-| `--ratio` | Aspect ratio: 16:9, 9:16, 1:1, 4:3, 3:4 | 16:9 |
-| `--seed` | Random seed for reproducibility | random |
+| `--mode` | t2v, i2v, r2v | t2v |
+| `--model` | Model name (auto-detected from mode) | wan2.6-t2v |
+| `--image` | First frame image (i2v mode) | - |
+| `--first` | First frame image (i2v mode, alias for --image) | - |
+| `--last` | Last frame image (i2v mode) | - |
+| `--ref` | Reference video/image URL or path (r2v mode, repeatable) | - |
+| `--first-frame` | First frame for r2v mode (controls opening shot) | - |
+| `--audio` | Audio file URL for video soundtrack | - |
+| `--reference-voice` | Audio URL for character voice reference (r2v) | - |
+| `--duration` | Video duration in seconds | t2v: 5, i2v: 5, r2v: 5 |
+| `--resolution` | 480P, 720P, 1080P | 720P |
+| `--ratio` | 16:9, 9:16, 1:1, 4:3, 3:4 | 16:9 |
+| `--shot-type` | single (单镜头) or multi (多镜头) | single |
+| `--no-audio` | Generate silent video (wan2.6-r2v-flash only) | - |
+| `--seed` | Random seed | random |
 | `--negative` | Negative prompt | - |
 | `--no-prompt-extend` | Disable prompt enhancement | - |
 | `--watermark` | Add "AI generated" watermark | - |
-| `--audio` | Audio file URL for video soundtrack | - |
 | `--task-id` | Task ID to check status | - |
 | `--poll` | Poll task until completion | - |
+
+## Reference-to-Video Details
+
+### Role Reference Convention
+References are identified by their order in the `--ref` array:
+
+| Order | wan2.7 (media array) | wan2.6 (reference_urls) |
+|-------|---------------------|------------------------|
+| 1st video | 视频1 | character1 |
+| 2nd video | 视频2 | character2 |
+| 1st image | 图1 | character1 |
+| 2nd image | 图2 | character2 |
+
+### Limits (wan2.7-r2v)
+- Reference images: up to 5
+- Reference videos: up to 3
+- Total images + videos: ≤ 5
+- First frame: max 1
+- Each reference contains one character/subject
+
+### Limits (wan2.6-r2v)
+- Reference images: up to 5
+- Reference videos: up to 3
+- Total images + videos: ≤ 5
+
+### Prompt Examples for Multi-character
+```
+# 2 characters interacting
+"视频1对视频2说：明天见！视频2笑着挥手告别"
+
+# Character with prop
+"character1抱着character3在窗边看书"
+
+# Storyboard-driven multi-shot
+"参考图片中的冒险故事：小男孩和小机器人在奇幻森林中寻找宝藏，保持角色和场景一致，不要加入文字"
+```
 
 ## API Details
 
 - **Provider**: Alibaba Cloud Bailian (DashScope)
-- **Models**: wan2.7-t2v, wan2.6-t2v, wan2.6-i2v, wan2.6-r2v
+- **Models**: wan2.7-t2v, wan2.6-t2v, wan2.6-i2v, wan2.7-r2v, wan2.6-r2v, wan2.6-r2v-flash
 - **API Key**: From bailian auth profile
 - **Base URL**: https://dashscope.aliyuncs.com
 
-## Video Generation Flow
-
-All video generation is **asynchronous**:
-1. Submit task → get `task_id`
-2. Poll status with `--task-id <id> --poll`
-3. Download video when `SUCCEEDED`
-
-Video URLs expire after 24 hours - download immediately.
-
 ## Notes
 
-- Video generation takes 1-5 minutes typically
-- wan2.7 supports up to 15 seconds duration
-- wan2.6 supports up to 10 seconds
-- Videos include auto-generated audio by default (wan2.6+)
+- All video generation is asynchronous (1-5 minutes)
+- Video URLs expire after 24 hours - download immediately
 - Output format: MP4 (H.264)
+- wan2.7 supports auto-generated audio from video content
+- wan2.6-r2v-flash supports silent video generation (`--no-audio`)
