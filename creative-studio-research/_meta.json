@@ -1,0 +1,7 @@
+{
+  "name": "creative-studio-research",
+  "version": "1.0.0",
+  "description": "Creative Studio Research Lab. Continuously researches AI image/video prompt engineering, maintains prompt libraries and scene libraries.",
+  "author": "胖福",
+  "tags": ["research", "prompt-engineering", "image-generation", "video-generation", "prompt-library", "scene-library"]
+}
