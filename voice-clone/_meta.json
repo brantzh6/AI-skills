@@ -1,0 +1,7 @@
+{
+  "name": "voice-clone",
+  "version": "1.0.0",
+  "description": "AI voice cloning and text-to-speech powered by Alibaba Cloud CosyVoice. Clone voices from audio samples or design new voices from text descriptions, then generate speech.",
+  "author": "胖福",
+  "tags": ["voice", "tts", "clone", "cosyvoice", "aliyun"]
+}

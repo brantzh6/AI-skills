@@ -1,0 +1,7 @@
+{
+  "name": "video-studio",
+  "version": "1.0.0",
+  "description": "AI video generation powered by Alibaba Cloud Wan 2.6/2.7. Supports text-to-video, image-to-video (first frame, first+last frame), reference video generation, and advanced parameters.",
+  "author": "胖福",
+  "tags": ["video", "generation", "wan2.6", "wan2.7", "aliyun", "t2v", "i2v", "r2v"]
+}
