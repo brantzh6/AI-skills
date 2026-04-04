@@ -1,0 +1,39 @@
+{
+  "name": "aliyun-bailian-sync",
+  "version": "1.0.0",
+  "description": "定期同步阿里云百炼平台最新模型信息到 Notion",
+  "author": "胖福",
+  "created": "2026-03-31",
+  "updated": "2026-03-31",
+  "tags": ["aliyun", "bailian", "sync", "notion", "cron"],
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": ["requests", "notion-client"]
+  },
+  "environment": {
+    "required": ["NOTION_API_KEY"],
+    "optional": ["NOTION_BAILIAN_DB_ID", "DASHSCOPE_API_KEY"]
+  },
+  "cron": {
+    "enabled": true,
+    "schedule": "0 0 * * 1",
+    "timezone": "Asia/Shanghai",
+    "description": "每周一 00:00 同步阿里云百炼信息"
+  },
+  "commands": {
+    "sync": "python scripts/sync.py sync",
+    "check": "python scripts/sync.py check",
+    "force": "python scripts/sync.py force-sync",
+    "status": "python scripts/sync.py status"
+  },
+  "files": {
+    "main": "scripts/sync.py",
+    "skill": "SKILL.md",
+    "docs": "docs/",
+    "cache": ".cache/"
+  },
+  "outputs": {
+    "notion_main": "C:\\Users\\jiuyou\\.openclaw\\workspace\\notion\\aliyun-bailian-capabilities.md",
+    "notion_method": "C:\\Users\\jiuyou\\.openclaw\\workspace\\notion\\aliyun-bailian-sync-method.md"
+  }
+}

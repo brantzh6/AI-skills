@@ -1,0 +1,36 @@
+{
+  "name": "aliyun-bailian-video-generation",
+  "version": "1.0.0",
+  "description": "阿里云百炼视频生成技能包，支持文生视频、图生视频、参考生视频、数字人、视频编辑等多种视频生成模式",
+  "author": "胖福",
+  "created": "2026-04-01",
+  "updated": "2026-04-01",
+  "tags": ["aliyun", "bailian", "video", "generation", "wanx", "digital-human"],
+  "dependencies": {
+    "python": ">=3.8",
+    "packages": ["dashscope>=1.25.8"]
+  },
+  "environment": {
+    "required": ["DASHSCOPE_API_KEY"],
+    "optional": ["DASHSCOPE_BASE_URL"]
+  },
+  "commands": {
+    "text2video": "文生视频",
+    "image2video": "图生视频 - 首帧",
+    "keyframe2video": "图生视频 - 首尾帧",
+    "reference2video": "参考生视频",
+    "video-edit": "视频编辑",
+    "digital-human": "数字人",
+    "animate-move": "图生动作",
+    "animate-mix": "视频换人"
+  },
+  "files": {
+    "main": "SKILL.md",
+    "examples": "examples/",
+    "templates": "templates/"
+  },
+  "outputs": {
+    "video_url": "生成的视频 URL (有效期 24 小时)",
+    "task_id": "异步任务 ID"
+  }
+}
