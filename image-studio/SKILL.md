@@ -1,77 +1,211 @@
 ---
 name: image-studio
-description: AI image generation and editing with Alibaba Cloud Wan 2.6. Text-to-image, image editing with reference images, style transfer, and more.
+description: AI image generation and editing studio with prompt engineering, style library, composition guide, and Alibaba Cloud Wan 2.6.
 ---
 
 # Image Studio 🎨
 
-AI image generation and editing powered by Alibaba Cloud Wan 2.6 models.
+完整的 AI 图像创作工作室。包含 prompt 工程、风格库、构图指南和最佳实践。
 
-## Capabilities
+## 核心能力
 
-| Mode | Model | Description |
-|------|-------|-------------|
-| **Text-to-Image** | wan2.6-t2i | Generate images from text prompts |
-| **Image Editing** | wan2.6-image | Edit images with reference images + prompts |
-| **Style Transfer** | wan2.6-image | Transfer style from reference to new content |
-| **Multi-Image Edit** | wan2.6-image | Use 1-4 reference images for editing |
+| 模块 | 功能 |
+|------|------|
+| **🎨 文生图** | Wan 2.6 文生图，支持多种风格 |
+| **✏️ 图像编辑** | 参考图 + 编辑指令，风格迁移、局部重绘 |
+| **📝 Prompt 工程** | 内置提示词模板、风格库、构图指南 |
+| **🖼️ 批量生成** | 一次生成 1-4 张，支持 seed 控制 |
 
-## Usage
+---
 
-### Generate Image from Text
+## 📝 Prompt 写法
+
+### 文生图 Prompt 公式
+
 ```
-/image <prompt>
-/image A beautiful sunset over mountains, oil painting style
-/image 一只可爱的猫咪坐在窗台上，阳光洒进来
-```
+[主体描述] + [外貌细节] + [动作/姿态] + [环境/场景] + [光影] + [构图] + [风格] + [画质]
 
-### Edit Image with Reference
-```
-/image-edit <image> <edit instruction>
-/image-edit cat.jpg make it wear a cowboy hat
+每个部分都是可选的，但包含越多，生成效果越精准。
 ```
 
-### Style Transfer
+### 各要素详解
+
+#### 主体描述
+- **人物**：年龄、性别、种族、职业
+  - 例：`18岁的中国女孩`、`中年欧洲男性摄影师`、`可爱的小女孩`
+- **动物**：品种、颜色、体型
+  - 例：`橘色英国短毛猫`、`白色的萨摩耶犬`
+- **物体**：类型、材质、颜色
+  - 例：`精致的木质茶杯`、`透明的玻璃花瓶`
+
+#### 外貌细节
+- **面部**：`圆脸`、`瓜子脸`、`大眼睛`、`高鼻梁`、`精致的淡妆`
+- **发型**：`黑色长发`、`金色卷发`、`短发`、`丸子头`
+- **服装**：`古代汉服`、`白色连衣裙`、`黑色西装`、`运动装`
+
+#### 动作/姿态
+- `正面看着镜头`、`侧身站立`、`回眸微笑`、`优雅地坐下`、`奔跑中`
+
+#### 环境/场景
+- **室内**：`咖啡厅`、`图书馆`、`卧室`、`工作室`
+- **室外**：`海边`、`花园`、`城市街道`、`山间小路`
+- **氛围**：`樱花飘落的春天`、`雨后的东京街头`、`星空下的草原`
+
+#### 光影
+| 光影类型 | 描述 | 示例 |
+|----------|------|------|
+| **自然光** | 日光、柔和 | `柔和的自然光`、`窗边的阳光` |
+| **黄昏光** | 金色、温暖 | `黄昏的金色余晖`、`夕阳暖光` |
+| **逆光** | 轮廓光、剪影 | `逆光拍摄`、`轮廓光勾勒` |
+| **电影光** | 专业三点布光 | `电影级三点布光`、`戏剧性光影` |
+| **霓虹** | 赛博朋克 | `霓虹灯闪烁`、`蓝紫色霓虹光` |
+
+#### 构图
+| 构图法 | 描述 |
+|--------|------|
+| **三分法** | 主体在画面1/3处 |
+| **中心构图** | 主体在画面中央 |
+| **对称构图** | 左右对称 |
+| **对角线** | 沿对角线布局 |
+| **前景虚化** | 前景模糊突出主体 |
+| **框架构图** | 用门窗等做画框 |
+
+#### 风格
+| 风格 | 英文关键词 | 说明 |
+|------|-----------|------|
+| **摄影** | `商业摄影`、`人像写真`、`纪实摄影` | 写实风格 |
+| **油画** | `油画`、`印象派`、`古典油画` | 艺术感 |
+| **水彩** | `水彩画`、`水彩插画` | 清新淡雅 |
+| **素描** | `素描`、`铅笔素描`、`炭笔画` | 线条感 |
+| **中国画** | `中国画`、`水墨画`、`工笔画` | 东方韵味 |
+| **插画** | `扁平插画`、`矢量插画`、`手绘插画` | 简洁明快 |
+| **3D** | `3D渲染`、`C4D`、`Blender` | 立体质感 |
+| **动画** | `日本动画风`、`迪士尼风格`、`皮克斯风格` | 卡通化 |
+| **赛博朋克** | `赛博朋克`、`科幻` | 未来感 |
+
+#### 画质关键词
+- `商业摄影`、`高分辨率`、`锐利边缘`、`精细细节`
+- `电影质感`、`8K`、`4K`、`超高清`
+- `浅景深`、`背景虚化`、`Bokeh`
+
+### 完整 Prompt 示例
+
+**人物写真：**
 ```
-/image-edit <reference_image> "generate <subject> in this style"
+近景镜头，25岁的中国女性，黑色长发自然垂落，穿着白色真丝衬衫，
+正面微侧看着镜头，温柔微笑，精致的淡妆，
+背景是模糊的咖啡厅窗户，柔和的自然光从侧面照来，
+商业人像摄影风格，浅景深，高分辨率，精细的皮肤质感
 ```
 
-### Advanced Options
+**风景：**
 ```
-/image <prompt> --size 1696*960 --n 1 --seed 42
-/image <prompt> --negative "low quality, blurry"
+全景，日本京都的樱花季，粉色的樱花瓣飘落在石板小路上，
+远处是传统的木造町屋建筑，一条清澈的小溪穿过街道，
+清晨的阳光透过樱花树洒下斑驳的光影，
+水彩画风格，淡雅的色彩，宁静祥和的氛围
 ```
 
-## Parameters
+**产品：**
+```
+精致的陶瓷茶杯放在原木桌面上，杯口袅袅升起热气，
+旁边散落着几片新鲜的薄荷叶，
+侧逆光照明，温暖的光线勾勒出茶杯的轮廓，
+暗色调背景突出主体，商业产品摄影风格，超高清，锐利边缘
+```
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `--size W*H` | Image resolution (see sizes below) | 1280*1280 |
-| `--n N` | Number of images (1-4) | 1 |
-| `--seed N` | Random seed for reproducibility | random |
-| `--negative TEXT` | Negative prompt | - |
-| `--no-prompt-extend` | Disable prompt enhancement | - |
-| `--watermark` | Add "AI generated" watermark | - |
+---
 
-### Common Resolutions
-| Ratio | Size |
-|-------|------|
-| 1:1 | 1280*1280 |
-| 3:4 | 1104*1472 |
-| 4:3 | 1472*1104 |
-| 16:9 | 1696*960 |
-| 9:16 | 960*1696 |
+## ✏️ 图像编辑
 
-## API Details
+### 模式说明
 
-- **Provider**: Alibaba Cloud Bailian (DashScope)
-- **Models**: wan2.6-t2i, wan2.6-image
-- **API Key**: From bailian auth profile
-- **Base URL**: https://dashscope.aliyuncs.com
+| 模式 | 说明 | 输入要求 |
+|------|------|----------|
+| **风格迁移** | 参考风格，生成新内容 | 1张参考图 + prompt |
+| **内容重绘** | 参考内容，修改细节 | 1-4张参考图 + prompt |
+| **多图融合** | 融合多张图元素 | 2-4张参考图 + prompt |
 
-## Notes
+### Prompt 写法
 
-- Generated images are PNG format
-- Image URLs expire after 24 hours - download immediately
-- Image editing requires at least 1 reference image
-- Maximum 4 reference images for editing mode
+**风格迁移：**
+```
+"参考图1的风格，生成{主体描述}"
+例：参考图1的风格，生成一杯咖啡
+```
+
+**多图融合：**
+```
+"参考图1的风格和图2的背景，生成{主体描述}"
+例：参考图1的油画风格和图2的海边背景，生成一只猫咪
+```
+
+**内容编辑：**
+```
+"{编辑指令}"
+例：把图中的帽子换成红色的、让猫咪睁开眼睛、添加一些花朵
+```
+
+---
+
+## 🎬 文生图
+
+```bash
+# 基础用法
+/image "prompt"
+
+# 指定参数
+/image "prompt" --size 1696*960 --n 1 --seed 42
+
+# 反向提示词（排除不想要的元素）
+/image "prompt" --negative "低画质, 肢体畸形, 多余手指"
+
+# 关闭智能改写（使用原始 prompt）
+/image "prompt" --no-prompt-extend
+```
+
+### 常用分辨率
+
+| 比例 | 分辨率 | 适用场景 |
+|------|--------|----------|
+| 1:1 | 1280*1280 | 社交媒体、头像 |
+| 3:4 | 1104*1472 | 竖版海报、手机壁纸 |
+| 4:3 | 1472*1104 | 横版展示 |
+| 16:9 | 1696*960 | 宽屏壁纸、封面 |
+| 9:16 | 960*1696 | 手机壁纸、短视频封面 |
+| 21:9 | 1344*576 | 超宽屏、电影感 |
+
+---
+
+## 📋 工作流示例
+
+### 示例：制作一套咖啡品牌宣传图
+
+**Step 1: 确定风格方向**
+先生成 4 张不同风格的探索：
+```
+/image "一杯精致的拿铁咖啡，白色陶瓷杯，木桌背景，柔和晨光" --n 4
+```
+
+**Step 2: 选定风格后精调**
+```
+/image "一杯精致的拿铁咖啡，白色陶瓷杯放在原木桌面上，杯口袅袅升起热气，
+旁边散落着几片新鲜薄荷叶，侧逆光温暖光线，暗色调背景突出主体，
+商业产品摄影风格，超高清，浅景深" \
+  --size 1472*1104 --n 1 --seed 12345
+```
+
+**Step 3: 风格迁移到其他产品**
+```
+/image-edit --ref step2_result.jpg "参考这张图的风格和光线，生成一杯冰美式咖啡，透明玻璃杯，冰块和咖啡分层"
+```
+
+---
+
+## ⚠️ 注意事项
+
+- 生成图片 URL 24 小时过期，及时下载
+- 按张计费，测试时建议 `--n 1`
+- prompt 长度不超过 2100 字符（wan2.6-t2i）
+- 智能改写会增加 3-4 秒耗时但效果明显更好
+- seed 相同时输出相对稳定，但不保证完全一致

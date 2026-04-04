@@ -1,135 +1,271 @@
 ---
 name: video-studio
-description: AI video generation with Alibaba Cloud Wan 2.6/2.7. Text-to-video, image-to-video (first frame, first+last frame), reference video generation with multi-character, multi-shot support.
+description: AI video generation studio with script writing, storyboarding, character management, and prompt engineering for Alibaba Cloud Wan 2.6/2.7.
 ---
 
 # Video Studio 🎬
 
-AI video generation powered by Alibaba Cloud Wan 2.6/2.7 models.
+完整的 AI 视频创作工作室。不仅仅是调用 API，更是从剧本到成片的完整工作流。
 
-## Capabilities
+## 核心能力
 
-| Mode | Model | Description |
-|------|-------|-------------|
-| **Text-to-Video** | wan2.7-t2v, wan2.6-t2v | Generate video from text prompt |
-| **Image-to-Video** | wan2.6-i2v | First frame or first+last frame → video |
-| **Reference-to-Video** | wan2.7-r2v, wan2.6-r2v | Multiple reference images/videos → multi-character video |
+| 模块 | 功能 |
+|------|------|
+| **📝 剧本助手** | 从想法到完整剧本，自动结构化 |
+| **👤 角色管理** | 定义角色、分配 reference、自动编号 |
+| **🎞️ 分镜脚本** | 自动生成标准分镜表（镜头/景别/运动/时长/内容） |
+| **🎬 视频生成** | t2v / i2v / r2v 全模式支持 |
+| **🔧 Prompt 工程** | 内置提示词模板、风格库、镜头语言库 |
 
-## Usage
+---
 
-### Text to Video
+## 📝 剧本写作
+
+### 短剧剧本结构
+
+一个 5-15 秒 AI 短剧的标准结构：
+
 ```
-/video <prompt>
-/video A cat walking in a garden, cinematic lighting --duration 10 --resolution 720P
+【片名】一句话概括故事
+【时长】5s / 10s / 15s
+【风格】3D卡通 / 写实电影 / 水墨 / 赛博朋克 / ...
+【角色】角色1：描述 | 角色2：描述 | ...
+【场景】主要场景描述
+【分镜】镜头1 → 镜头2 → 镜头3 → ...
 ```
 
-### Image to Video
+### 分镜脚本格式
+
+每个镜头必须包含以下要素：
+
 ```
-# First frame only
-/video --mode i2v --image <first_frame.jpg> <prompt>
-
-# First + Last frame (controlled transition)
-/video --mode i2v --first <start.jpg> --last <end.jpg> <prompt>
+镜头X [时长X秒]
+- 景别：全景 / 中景 / 近景 / 特写
+- 角度：平视 / 仰视 / 俯视 / 鸟瞰
+- 运动：固定 / 推 / 拉 / 摇 / 移 / 跟 / 升 / 降
+- 内容：画面描述（主体 + 动作 + 环境 + 光影 + 情绪）
 ```
 
-### Reference to Video (Multi-character, Multi-shot)
+### Prompt 写法公式
+
+**文生视频（t2v）Prompt 公式：**
 ```
-# Single character reference (video)
-/video --mode r2v --ref <character_video.mp4> <prompt>
-  → Use "character1" or "参考视频" in prompt
+[景别] + [主体] + [动作] + [环境] + [光影] + [氛围/情绪] + [风格]
 
-# Single character reference (image)
-/video --mode r2v --ref <character.jpg> <prompt>
-  → Use "图1" or "参考图片" in prompt
+示例：
+近景，一位穿着白色连衣裙的少女站在海边，微风吹起她的长发和裙摆，
+夕阳的金色余晖洒在她身上，海面波光粼粼，背景是粉紫色的晚霞，
+氛围宁静温柔，电影质感，浅景深
+```
 
-# Multi-character interaction (up to 3 videos + 2 images = 5 total)
+**参考生视频（r2v）Prompt 公式（多角色）：**
+```
+wan2.7: [视频1/图1的角色] + [动作/台词] + [视频2/图2的角色] + [反应/动作] + [环境/光影]
+wan2.6: character1 + [动作/台词] + character2 + [反应/动作] + [环境/光影]
+
+示例（wan2.7）：
+视频1坐在靠窗的木桌旁，弹奏着一把吉他，弹奏着舒缓的民谣。
+图3（一把吉他）被他抱在怀中。视频2坐在对面，微笑着看着他，
+窗外是午后温暖的阳光，咖啡厅里飘着咖啡豆的香气，氛围温馨
+
+示例（wan2.6）：
+character1坐在咖啡厅的木桌旁弹吉他，character2坐在对面微笑着倾听，
+午后的阳光从窗户洒进来，氛围温馨浪漫
+```
+
+---
+
+## 🎞️ 分镜脚本模板
+
+### 标准分镜表
+
+| 镜头 | 时长 | 景别 | 角度 | 运动 | 画面描述 |
+|------|------|------|------|------|----------|
+| 1 | 3s | 全景 | 俯视 | 缓慢推进 | 城市天际线，黄昏，灯光渐次亮起 |
+| 2 | 2s | 中景 | 平视 | 固定 | 主角站在窗前，背影，手中端着咖啡杯 |
+| 3 | 3s | 近景 | 侧视 | 缓慢右摇 | 主角转头望向窗外，表情若有所思 |
+| 4 | 2s | 特写 | 平视 | 固定 | 咖啡杯中升起的袅袅热气 |
+| 5 | 5s | 中景→全景 | 平视 | 缓慢拉远 | 主角放下杯子，走向门口，镜头跟随拉远 |
+
+### 分镜生成指令
+
+```
+/video --script "帮我生成分镜脚本" \
+  --title "雨中相遇" \
+  --duration 10 \
+  --style "电影质感，日系小清新" \
+  --characters "女孩：撑伞，白裙，20岁 | 男孩：穿雨衣，背着吉他" \
+  --scene "东京街头，樱花飘落的春雨天"
+```
+
+---
+
+## 🎨 镜头语言库
+
+### 景别定义
+
+| 景别 | 画面范围 | 用途 |
+|------|----------|------|
+| **大远景** | 环境为主，人物很小 | 交代场景、氛围 |
+| **全景** | 人物全身 + 部分环境 | 人物与环境关系 |
+| **中景** | 人物膝盖以上 | 叙事主力，对话场景 |
+| **近景** | 人物胸部以上 | 表情、情绪 |
+| **特写** | 面部/手部/物体细节 | 强调关键元素 |
+| **大特写** | 眼睛/嘴唇/微小细节 | 极致情绪表达 |
+
+### 镜头运动
+
+| 运动 | 效果 | 示例 |
+|------|------|------|
+| **固定** | 稳定、客观 | 对话、静物 |
+| **推** | 聚焦、紧张 | 发现、揭示 |
+| **拉** | 远离、释然 | 结局、离别 |
+| **摇** | 环视、搜索 | 探索、观察 |
+| **移** | 跟随、流动 | 行走、奔跑 |
+| **跟** | 伴随、沉浸 | 追逐、同行 |
+| **升** | 开阔、升华 | 高潮、领悟 |
+| **降** | 回归、压抑 | 失落、沉思 |
+
+### 光影风格
+
+| 风格 | 描述 |
+|------|------|
+| **自然光** | 日光、黄昏、黎明，温暖真实 |
+| **电影光** | 三点布光，专业质感 |
+| **低照度** | 暗调、霓虹、赛博朋克 |
+| **逆光** | 轮廓光、剪影、唯美 |
+| **顶光** | 戏剧性、悬疑感 |
+| **侧光** | 立体感、质感突出 |
+
+---
+
+## 🎬 视频生成
+
+### 模式选择
+
+```
+想从零开始生成 → t2v（文生视频）
+有一张图想动起来 → i2v（图生视频）
+有角色/风格参考 → r2v（参考生视频）
+```
+
+### 文生视频（t2v）
+
+```bash
+# 基础用法
+/video --mode t2v "prompt"
+
+# 完整参数
+/video --mode t2v "prompt" \
+  --model wan2.6-t2v \
+  --duration 10 \
+  --resolution 720P \
+  --ratio 16:9 \
+  --seed 42
+```
+
+### 图生视频（i2v）
+
+```bash
+# 首帧生成
+/video --mode i2v "prompt" --image first_frame.jpg
+
+# 首尾帧控制（精确控制起止画面）
+/video --mode i2v "prompt" --first start.jpg --last end.jpg
+```
+
+### 参考生视频（r2v）
+
+**wan2.7 角色引用方式：视频1、视频2、图1、图2...**
+**wan2.6 角色引用方式：character1、character2...**
+
+```bash
+# 单角色
+/video --mode r2v --ref character.mp4 "视频1在花园里散步"
+
+# 多角色互动
 /video --mode r2v \
-  --ref <char1.mp4> --ref <char2.mp4> --ref <prop.jpg> \
-  "视频1抱着图3在咖啡厅弹奏民谣，视频2笑着看着视频1"
+  --ref girl.mp4 --ref boy.mp4 \
+  "视频1对视频2说：你好！视频2笑着回应"
 
-# Multi-shot storytelling with storyboard image
-/video --mode r2v --ref <storyboard.png> <prompt>
-  → Describe storyboard panels in prompt (panel 1, panel 2, etc.)
-
-# With first frame control
+# 多角色 + 道具
 /video --mode r2v \
-  --ref <char1.mp4> --ref <char2.mp4> \
-  --first-frame <opening_scene.jpg> \
-  "视频1和图1在花园里对话"
+  --ref char1.mp4 --ref char2.mp4 --ref guitar.jpg \
+  "视频1抱着图3弹奏，视频2在旁边倾听"
+
+# 多镜头叙事
+/video --mode r2v \
+  --ref storyboard.png \
+  "冒险故事，保持角色和场景一致" \
+  --shot-type multi --duration 10
+
+# 分镜脚本生成视频
+/video --mode r2v \
+  --ref char1.mp4 --ref char2.mp4 --ref background.jpg \
+  --first-frame opening.jpg \
+  "镜头1[全景]：图3的环境中，视频1走进画面。镜头2[中景]：视频2转身看到视频1，露出微笑。镜头3[近景]：两人对视，视频1说：好久不见。镜头4[特写]：两双手握在一起" \
+  --duration 10 --shot-type multi
 ```
 
-## Parameters
+---
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `--mode` | t2v, i2v, r2v | t2v |
-| `--model` | Model name (auto-detected from mode) | wan2.6-t2v |
-| `--image` | First frame image (i2v mode) | - |
-| `--first` | First frame image (i2v mode, alias for --image) | - |
-| `--last` | Last frame image (i2v mode) | - |
-| `--ref` | Reference video/image URL or path (r2v mode, repeatable) | - |
-| `--first-frame` | First frame for r2v mode (controls opening shot) | - |
-| `--audio` | Audio file URL for video soundtrack | - |
-| `--reference-voice` | Audio URL for character voice reference (r2v) | - |
-| `--duration` | Video duration in seconds | t2v: 5, i2v: 5, r2v: 5 |
-| `--resolution` | 480P, 720P, 1080P | 720P |
-| `--ratio` | 16:9, 9:16, 1:1, 4:3, 3:4 | 16:9 |
-| `--shot-type` | single (单镜头) or multi (多镜头) | single |
-| `--no-audio` | Generate silent video (wan2.6-r2v-flash only) | - |
-| `--seed` | Random seed | random |
-| `--negative` | Negative prompt | - |
-| `--no-prompt-extend` | Disable prompt enhancement | - |
-| `--watermark` | Add "AI generated" watermark | - |
-| `--task-id` | Task ID to check status | - |
-| `--poll` | Poll task until completion | - |
+## 📋 完整工作流示例
 
-## Reference-to-Video Details
+### 示例：制作一个 10 秒的咖啡厅相遇短片
 
-### Role Reference Convention
-References are identified by their order in the `--ref` array:
-
-| Order | wan2.7 (media array) | wan2.6 (reference_urls) |
-|-------|---------------------|------------------------|
-| 1st video | 视频1 | character1 |
-| 2nd video | 视频2 | character2 |
-| 1st image | 图1 | character1 |
-| 2nd image | 图2 | character2 |
-
-### Limits (wan2.7-r2v)
-- Reference images: up to 5
-- Reference videos: up to 3
-- Total images + videos: ≤ 5
-- First frame: max 1
-- Each reference contains one character/subject
-
-### Limits (wan2.6-r2v)
-- Reference images: up to 5
-- Reference videos: up to 3
-- Total images + videos: ≤ 5
-
-### Prompt Examples for Multi-character
+**步骤 1：剧本**
 ```
-# 2 characters interacting
-"视频1对视频2说：明天见！视频2笑着挥手告别"
-
-# Character with prop
-"character1抱着character3在窗边看书"
-
-# Storyboard-driven multi-shot
-"参考图片中的冒险故事：小男孩和小机器人在奇幻森林中寻找宝藏，保持角色和场景一致，不要加入文字"
+【片名】咖啡厅相遇
+【时长】10秒
+【风格】日系小清新，温暖柔和
+【角色】女孩：黑色长发，白衬衫，20岁 | 男孩：短发，蓝毛衣，20岁
+【场景】街角咖啡厅，午后阳光，木质桌椅，窗边绿植
+【分镜】
+  镜头1[3s] 全景→中景 推：女孩坐在窗边看书，阳光透过玻璃
+  镜头2[3s] 中景 固定：男孩推门进来，风铃响起，女孩抬头
+  镜头3[4s] 近景 缓慢右摇：男孩走向女孩，两人相视而笑
 ```
 
-## API Details
+**步骤 2：准备素材**
+- 录制/准备女孩的参考视频 → `girl.mp4`
+- 录制/准备男孩的参考视频 → `boy.mp4`
+- 准备咖啡厅背景图 → `cafe.jpg`
 
-- **Provider**: Alibaba Cloud Bailian (DashScope)
-- **Models**: wan2.7-t2v, wan2.6-t2v, wan2.6-i2v, wan2.7-r2v, wan2.6-r2v, wan2.6-r2v-flash
-- **API Key**: From bailian auth profile
-- **Base URL**: https://dashscope.aliyuncs.com
+**步骤 3：生成视频**
+```bash
+/video --mode r2v \
+  --ref girl.mp4 --ref boy.mp4 --ref cafe.jpg \
+  "视频1坐在窗边看书，午后的阳光透过玻璃洒在她身上。
+   视频2推门进来，风铃响起，视频1抬头看向视频2。
+   视频2走向视频1，两人相视而笑。
+   日系小清新风格，温暖柔和的光线，木质桌椅，窗边绿植" \
+  --duration 10 --shot-type multi --resolution 720P
+```
 
-## Notes
+---
 
-- All video generation is asynchronous (1-5 minutes)
-- Video URLs expire after 24 hours - download immediately
-- Output format: MP4 (H.264)
-- wan2.7 supports auto-generated audio from video content
-- wan2.6-r2v-flash supports silent video generation (`--no-audio`)
+## 🔧 参数参考
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--mode` | t2v / i2v / r2v | t2v |
+| `--model` | 模型名 | 自动匹配 |
+| `--ref` | 参考文件（可重复） | - |
+| `--image/--first/--last` | 首帧/尾帧 | - |
+| `--first-frame` | r2v首帧控制 | - |
+| `--duration` | 时长(秒) | 5 |
+| `--resolution` | 480P/720P/1080P | 720P |
+| `--ratio` | 16:9/9:16/1:1/4:3/3:4 | 16:9 |
+| `--shot-type` | single/multi | single |
+| `--seed` | 随机种子 | random |
+| `--audio` | 配乐URL | - |
+| `--watermark` | AI水印 | off |
+
+## 注意事项
+
+- 所有生成均为异步任务，提交后返回 task_id
+- 视频生成通常需要 1-5 分钟
+- 视频 URL 24 小时过期，及时下载
+- wan2.7 默认自动配乐，wan2.6 需显式开启
+- 参考素材每个文件只含一个角色
+- 多角色互动建议使用 wan2.7-r2v（效果最佳）

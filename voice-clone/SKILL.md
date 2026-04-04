@@ -1,82 +1,206 @@
 ---
 name: voice-clone
-description: Digital voice cloning and TTS with Alibaba Cloud CosyVoice. Clone your voice from audio, design new voices from text descriptions, and generate speech.
+description: Digital voice cloning and TTS studio with voice design prompt engineering, cloning best practices, and Alibaba Cloud CosyVoice.
 ---
 
 # Voice Clone 🎙️
 
-Digital voice cloning and text-to-speech powered by Alibaba Cloud CosyVoice.
+数字分身音色工作室。从录音复刻到文字设计音色，再到语音合成。
 
-## Capabilities
+## 核心能力
 
-| Mode | Model | Description |
-|------|-------|-------------|
-| **Voice Cloning** | cosyvoice-v3.5-plus | Clone a voice from 10-20 second audio sample |
-| **Voice Design** | cosyvoice-v3.5-plus | Design a voice from text description |
-| **TTS Synthesis** | cosyvoice-v3.5-plus/flash | Generate speech with any voice |
+| 模块 | 功能 |
+|------|------|
+| **🎙️ 声音复刻** | 从 10-20 秒录音复刻真实音色 |
+| **✍️ 声音设计** | 用文字描述从零设计音色 |
+| **🔊 语音合成** | 用复刻/设计的音色朗读文本 |
+| **📋 音色管理** | 保存、列出、切换音色 |
 
-## Usage
+---
 
-### Clone Voice from Audio
+## 🎙️ 声音复刻
+
+### 录音要求
+
+| 要求 | 标准 |
+|------|------|
+| **时长** | 10-20 秒（最短 10 秒，建议 15-20 秒） |
+| **音质** | 清晰、无噪音、无回声 |
+| **语速** | 正常语速，不要过快或过慢 |
+| **内容** | 自然朗读，不要太夸张 |
+| **格式** | WAV/MP3，采样率 ≥ 16kHz |
+
+### 录音技巧
+
+**✅ 好的录音：**
+- 在安静房间录制，关闭空调、风扇
+- 使用手机/麦克风，距离嘴巴 10-15cm
+- 用正常说话的声音朗读
+- 可以读新闻、散文、诗歌
+
+**❌ 避免：**
+- 嘈杂环境（街道、咖啡厅）
+- 喊叫或耳语
+- 音乐/特效作为背景
+- 多人同时说话
+
+### 录音内容示例
+
 ```
-/voice-clone <audio_file> --name myvoice
-```
-Upload a 10-20 second clear speech recording. Returns a `voice_id`.
-
-### Design Voice from Description
-```
-/voice-design "沉稳的中年男性播音员，音色低沉浑厚，富有磁性" --preview "大家好，欢迎收听"
-```
-
-### Generate Speech
-```
-/speak <text> --voice <voice_id>
-/speak "你好，这是用我的声音生成的语音" --voice myvoice_xxx
-```
-
-### List Saved Voices
-```
-/voice-list
-```
-
-## Voice Config Storage
-
-Voices are saved to `voice-clone/voices.json`:
-```json
-{
-  "default": "myvoice_xxx",
-  "voices": {
-    "myvoice_xxx": {
-      "voice_id": "myvoice_xxx",
-      "name": "我的声音",
-      "target_model": "cosyvoice-v3.5-plus",
-      "created_at": "2026-04-04"
-    }
-  }
-}
+"人工智能正在改变我们的生活方式，从语音助手到自动驾驶，
+从智能医疗到个性化教育，AI 技术正在各个领域发挥重要作用。
+未来，人工智能将更加智能化、人性化，成为人类生活不可或缺的伙伴。"
 ```
 
-## Parameters
+### 复刻流程
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `--name` | Voice name for cloning | auto-generated |
-| `--voice` | Voice ID for TTS | default from config |
-| `--model` | TTS model | cosyvoice-v3.5-plus |
-| `--format` | Audio format | mp3 |
-| `--speed` | Speech speed | 1.0 |
-| `--preview TEXT` | Preview text for voice design | 大家好，欢迎收听 |
+```bash
+# 步骤 1：上传录音到公网（OSS/图床/任何可访问的 URL）
+# 步骤 2：创建音色复刻任务
+/voice-clone clone <audio_url> --name myvoice
 
-## API Details
+# 步骤 3：等待复刻完成（约 1-2 分钟）
+/voice-clone poll <voice_id> --save
 
-- **Provider**: Alibaba Cloud Bailian (DashScope)
-- **Models**: cosyvoice-v3.5-plus, cosyvoice-v3.5-flash
-- **API Key**: From bailian auth profile
-- **Base URL**: https://dashscope.aliyuncs.com
+# 步骤 4：用复刻的音色合成语音
+/voice-clone speak "你好，这是用我的声音生成的语音"
+```
 
-## Notes
+---
 
-- Voice cloning requires clear speech audio (10-20 seconds minimum)
-- Audio should be in a supported language (Chinese, English, etc.)
-- Voice IDs are persistent and can be reused
-- Audio output is MP3 format by default
+## ✍️ 声音设计
+
+### 声音描述公式
+
+```
+[年龄/性别] + [音色特征] + [说话风格] + [适用场景]
+```
+
+### 声音描述要素
+
+#### 年龄/性别
+| 类型 | 描述词 |
+|------|--------|
+| **儿童** | 童声、稚嫩、清脆 |
+| **青年** | 年轻、活力、清亮 |
+| **中年** | 沉稳、浑厚、磁性 |
+| **老年** | 苍老、沙哑、沧桑 |
+
+#### 音色特征
+| 特征 | 描述词 |
+|------|--------|
+| **音调** | 低沉、浑厚、清亮、高亢、柔和 |
+| **质感** | 磁性、温暖、干净、沙哑、甜美 |
+| **力度** | 轻柔、有力、平和、激情 |
+
+#### 说话风格
+| 风格 | 描述词 |
+|------|--------|
+| **语速** | 语速缓慢、语速平稳、语速轻快、语速较快 |
+| **吐字** | 吐字清晰、咬字有力、柔和圆润 |
+| **情感** | 温暖亲切、严肃庄重、活泼开朗、深情款款 |
+
+#### 适用场景
+`新闻播报`、`有声书`、`广告配音`、`纪录片解说`、`角色配音`、`教学讲解`
+
+### 声音描述示例
+
+**中年男播音员：**
+```
+沉稳的中年男性播音员，音色低沉浑厚，富有磁性，
+语速平稳，吐字清晰，适合用于新闻播报或纪录片解说。
+```
+
+**青年女主播：**
+```
+年轻的女性主播，音色清亮甜美，温暖亲切，
+语速轻快，吐字清晰，适合用于有声读物和播客节目。
+```
+
+**纪录片解说：**
+```
+成熟男性解说员，音色浑厚有力，充满威严感，
+语速缓慢，停顿得当，适合用于自然纪录片和历史纪录片的旁白。
+```
+
+**童书故事：**
+```
+温柔的女性声音，音色甜美柔和，充满亲和力，
+语速缓慢，语气生动，适合用于儿童故事有声书。
+```
+
+**广告男声：**
+```
+青年男性，音色阳光温暖，充满活力和感染力，
+语速较快，语调上扬，适合用于产品广告和品牌宣传。
+```
+
+### 设计流程
+
+```bash
+# 步骤 1：设计音色并试听
+/voice-clone design "沉稳的中年男性播音员，音色低沉浑厚，富有磁性" \
+  --preview "各位听众朋友，大家好，欢迎收听晚间新闻"
+
+# 步骤 2：对试听满意后保存
+/voice-clone set-default <voice_id>
+
+# 步骤 3：用设计的音色合成
+/voice-clone speak "今天天气晴朗，适合外出游玩"
+```
+
+---
+
+## 🔊 语音合成
+
+### 基础用法
+
+```bash
+# 使用默认音色
+/voice-clone speak "你好，欢迎使用语音合成"
+
+# 指定音色
+/voice-clone speak "你好" --voice <voice_id>
+
+# 指定模型
+/voice-clone speak "你好" --model cosyvoice-v3.5-plus
+```
+
+### 模型选择
+
+| 模型 | 特点 | 适用场景 |
+|------|------|----------|
+| **cosyvoice-v3.5-plus** | 效果最好，支持声音复刻/设计 | 高品质配音、品牌声音 |
+| **cosyvoice-v3.5-flash** | 速度快，成本低 | 实时交互、批量合成 |
+| **cosyvoice-v3-flash** | 多语言支持广 | 多语言场景 |
+
+### 支持语言
+
+cosyvoice-v3.5-plus 支持：
+- **中文**：普通话、广东话、河南话、湖北话、闽南话、陕西话、山东话、上海话、四川话等
+- **外语**：英语、法语、德语、日语、韩语、俄语、葡萄牙语、泰语、印尼语、越南语
+
+---
+
+## 📋 音色管理
+
+```bash
+# 列出所有已保存的音色
+/voice-clone list
+
+# 设置默认音色
+/voice-clone set-default <voice_id>
+
+# 使用特定音色合成
+/voice-clone speak "text" --voice <voice_id>
+```
+
+---
+
+## ⚠️ 注意事项
+
+- 音色创建后需要等待部署完成（约 1-2 分钟）才能使用
+- 声音复刻和语音合成要使用相同的模型
+- 合成文本建议不超过 500 字（单次合成）
+- 音频输出为 MP3 格式，采样率 24kHz
+- 音色 ID 持久保存，可以重复使用
