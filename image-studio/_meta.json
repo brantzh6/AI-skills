@@ -1,0 +1,7 @@
+{
+  "name": "image-studio",
+  "version": "1.0.0",
+  "description": "AI image generation and editing powered by Alibaba Cloud Wan 2.6 models. Supports text-to-image, image editing with reference images, style transfer, and more.",
+  "author": "胖福",
+  "tags": ["image", "generation", "editing", "wan2.6", "aliyun"]
+}
