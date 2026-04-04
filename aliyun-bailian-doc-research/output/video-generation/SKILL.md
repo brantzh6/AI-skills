@@ -1,6 +1,6 @@
 ---
 name: aliyun-bailian-video-generation
-description: 阿里云百炼视频生成技能包，支持文生视频、图生视频、参考生视频、数字人、视频编辑等多种视频生成模式，适配不同应用场景。
+description: 阿里云百炼专业视频生成技能包 (Wan 2.7 首选)，支持 4K 原生、原生音频、首尾帧控制、9 宫格图生视频、角色克隆及指令编辑。
 homepage: https://help.aliyun.com/zh/model-studio/use-video-generation
 metadata:
   {
@@ -21,26 +21,34 @@ metadata:
   }
 ---
 
-# 阿里云百炼视频生成技能包
+# 阿里云百炼视频生成技能包 (Wan 2.7 Pro)
 
-**版本**: v1.0  
-**创建时间**: 2026-04-01  
-**适用场景**: 视频生成、视频编辑、数字人制作
+**版本**: v2.0  
+**更新时间**: 2026-04-04  
+**首选模型**: **Wan 2.7** (原生 4K, 30s, 原生音频)  
+**适用场景**: 专业影视制作、多镜头叙事、品牌视频、YouTube 规模化
 
 ---
 
-## 🎯 功能概览
+## 🎯 功能概览 (Wan 2.7 增强版)
 
-本技能包提供完整的视频生成能力，覆盖：
+本技能包提供行业领先的视频生成能力：
 
-### 通用视频生成
-- ✅ **文生视频** (Text-to-Video)
-- ✅ **图生视频 - 首帧** (Image-to-Video by First Frame)
-- ✅ **图生视频 - 首尾帧** (Image-to-Video by First & Last Frame)
-- ✅ **参考生视频** (Reference-to-Video)
-- ✅ **视频编辑** (Video Editing)
+### 🚀 核心生成 (Wan 2.7)
+- ✅ **原生 4K 视频生成** (最高 4K 分辨率)
+- ✅ **原生音频同步** (自动生成环境音 + 角色配音)
+- ✅ **首尾帧精确控制** (First/Last Frame Control)
+- ✅ **9 宫格图生视频** (3x3 Grid Image-to-Video)
+- ✅ **长镜头生成** (单镜头最长 30 秒)
+- ✅ **角色 + 声音克隆** (Subject + Voice Cloning)
+- ✅ **指令式编辑** (Instruction-Based Editing, Beta)
 
-### 数字人/人像视频
+### 🎬 通用视频生成
+- ✅ **文生视频** (T2V)
+- ✅ **图生视频** (I2V)
+- ✅ **参考生视频** (R2V)
+
+### 🤵 数字人/人像视频
 - ✅ **数字人** (Digital Human)
 - ✅ **图生动作** (Image-to-Action)
 - ✅ **视频换人** (Video Character Replacement)
@@ -93,15 +101,13 @@ metadata:
 
 根据文本提示词生成视频，支持输入文本 + 音频，输出电影级多镜头视频。
 
-### 支持模型
+### 支持模型 (Wan 2.7 首选)
 
 | 模型 | 地域 | 有声/无声 | 分辨率 | 时长 | 特点 |
 |------|------|---------|--------|------|------|
-| **wan2.6-t2v** ⭐推荐 | 北京/新加坡/弗吉尼亚 | 有声 | 720P/1080P | 2-15 秒 | 多镜头叙事、声画同步 |
-| **wan2.5-t2v-preview** | 北京/新加坡 | 有声 | 480P/720P/1080P | 5s/10s | 声画同步 |
-| **wan2.2-t2v-plus** | 北京/新加坡 | 无声 | 480P/1080P | 5 秒 | 稳定性提升 |
-| **wanx2.1-t2v-turbo** | 北京/新加坡 | 无声 | 480P/720P | 5 秒 | 快速生成 |
-| **wanx2.1-t2v-plus** | 北京/新加坡 | 无声 | 720P | 5 秒 | 标准质量 |
+| **wan2.7-t2v** ⭐首选 | 北京 | **原生音频** | **1080P/4K** | **15-30 秒** | 首尾帧控制、原生音频 |
+| wan2.6-t2v | 北京/新加坡 | 有声 | 720P/1080P | 2-15 秒 | 多镜头叙事 |
+| wan2.5-t2v-preview | 北京/新加坡 | 有声 | 480P/720P/1080P | 5s/10s | 声画同步 |
 
 ### 使用示例
 
@@ -117,16 +123,16 @@ import dashscope
 dashscope.base_http_api_url = 'https://dashscope.aliyuncs.com/api/v1'
 api_key = os.getenv("DASHSCOPE_API_KEY")
 
-# 异步调用文生视频
+# 异步调用文生视频 (Wan 2.7)
 rsp = VideoSynthesis.async_call(
     api_key=api_key,
-    model='wan2.6-t2v',
-    prompt='一段紧张刺激的侦探追查故事，展现电影级叙事能力。第 1 个镜头 [0-3 秒] 全景：雨夜的纽约街头，霓虹灯闪烁，一位身穿黑色风衣的侦探快步行走。',
-    size="1280*720",
-    duration=15,
-    shot_type="multi",  # 多镜头
-    prompt_extend=True,  # 智能改写
-    watermark=True
+    model='wan2.7-t2v',
+    prompt='一段紧张刺激的侦探追查故事...原生环境音：雨声、警笛声。',
+    size="1920*1080",
+    duration=30,
+    shot_type="multi",
+    prompt_extend=True,
+    native_audio=True  # 开启原生音频
 )
 
 if rsp.status_code == HTTPStatus.OK:
