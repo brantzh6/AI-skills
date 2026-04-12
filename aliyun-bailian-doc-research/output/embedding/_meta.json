@@ -1,0 +1,10 @@
+{
+  "name": "embedding",
+  "version": "2026-04-12",
+  "description": "阿里云百炼向量模型文档：文本向量、多模态向量、融合向量",
+  "last_updated": "2026-04-12",
+  "sources": [
+    "https://help.aliyun.com/zh/model-studio/embedding"
+  ],
+  "files": ["SKILL.md"]
+}

@@ -1,11 +1,11 @@
 ---
 name: image-studio
-description: AI image generation and editing studio with prompt engineering, style library, composition guide, and Alibaba Cloud Wan 2.6.
+description: Professional AI image generation and editing studio with Wan 2.7-Image. Includes prompt engineering, style library, composition guide, and action logic control.
 ---
 
 # Image Studio 🎨
 
-完整的 AI 图像创作工作室。包含 prompt 工程、风格库、构图指南和最佳实践。
+专业的 AI 图像创作工作室。基于 **Wan 2.7-Image**，包含 prompt 工程、风格库、构图指南和动作逻辑控制。
 
 ## 核心能力
 
@@ -116,6 +116,27 @@ description: AI image generation and editing studio with prompt engineering, sty
 
 ---
 
+## 🚀 Wan 2.7 Prompt 进阶技巧
+
+### 1. 明确主次与动作逻辑 (Action Logic)
+AI 容易混淆互动画面中的主动者和被动者。请使用**强动词**和**明确的空间位置**：
+*   ❌ **差的写法**: "A cat and a fox fighting." (AI 可能会画成猫被追，或者两只动物在玩耍)
+*   ✅ **好的写法**: "A fluffy cat **pounces on** a fox from above. The cat's paws **hold down** the fox. The fox is **fleeing** in panic."
+*   **技巧**: 使用 `pounces on` (扑向), `catches` (抓住), `holds down` (按住) 等动词明确主导方。
+
+### 2. 指定具体品种特征
+对于特定动物或物体，描述其标志性特征：
+*   **布偶猫**: `Seal point ragdoll cat` (海豹色重点色), `blue eyes` (蓝眼睛), `dark mask on face` (脸部深色面具).
+*   **狐狸**: `Red fox` (红狐狸), `bushy tail` (蓬松的尾巴).
+
+### 3. 风格化控制
+Wan 2.7 对风格关键词非常敏感。
+*   **卡通/动画**: `Pixar 3D animation style`, `Disney style`, `Anime style`, `Cartoon render`.
+*   **电影感**: `Cinematic lighting`, `Movie still`, `Shot on IMAX`, `Anamorphic lens`.
+*   **写实**: `Photorealistic`, `8K resolution`, `Highly detailed`, `National Geographic photography`.
+
+---
+
 ## ✏️ 图像编辑
 
 ### 模式说明
@@ -204,8 +225,8 @@ description: AI image generation and editing studio with prompt engineering, sty
 
 ## ⚠️ 注意事项
 
+- **首选 Wan 2.7 模型**: 支持 4K 画质、更精准的 Prompt 理解、指令式编辑。
 - 生成图片 URL 24 小时过期，及时下载
 - 按张计费，测试时建议 `--n 1`
-- prompt 长度不超过 2100 字符（wan2.6-t2i）
 - 智能改写会增加 3-4 秒耗时但效果明显更好
 - seed 相同时输出相对稳定，但不保证完全一致

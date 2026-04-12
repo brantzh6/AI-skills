@@ -1,11 +1,11 @@
 ---
 name: video-studio
-description: AI video generation studio with script writing, storyboarding, character management, and prompt engineering for Alibaba Cloud Wan 2.6/2.7.
+description: AI video generation studio with script writing, storyboarding, character management, and prompt engineering for Alibaba Cloud Wan 2.7.
 ---
 
 # Video Studio 🎬
 
-完整的 AI 视频创作工作室。不仅仅是调用 API，更是从剧本到成片的完整工作流。
+完整的 AI 视频创作工作室。从剧本到成片的完整工作流，基于阿里云百炼 Wan 2.7 系列。
 
 ## 核心能力
 
@@ -14,8 +14,23 @@ description: AI video generation studio with script writing, storyboarding, char
 | **📝 剧本助手** | 从想法到完整剧本，自动结构化 |
 | **👤 角色管理** | 定义角色、分配 reference、自动编号 |
 | **🎞️ 分镜脚本** | 自动生成标准分镜表（镜头/景别/运动/时长/内容） |
-| **🎬 视频生成** | t2v / i2v / r2v 全模式支持 |
+| **🎬 视频生成** | t2v / i2v(首帧/首尾帧/续写) / r2v / videoedit 全模式 |
 | **🔧 Prompt 工程** | 内置提示词模板、风格库、镜头语言库 |
+| **✨ 专业特性** | 1080P、音频同步、首尾帧控制、指令编辑、视频续写 |
+
+---
+
+## 📋 模型选型（Wan 2.7 全系列）
+
+| 模型 | 功能 | 输入 | 分辨率 | 时长 | 首选场景 |
+|------|------|------|--------|------|---------|
+| **wan2.7-t2v** ⭐ | 文生视频 | 文本 + 音频(可选) | 720P/1080P | 2-15s | 从零生成视频 |
+| **wan2.7-i2v** ⭐ | 图生视频 | 首帧/首尾帧/首段视频 + 音频(可选) | 720P/1080P | 2-15s | 图片动起来、过渡、续写 |
+| **wan2.7-videoedit** ⭐ | 视频编辑 | 视频 + 文本指令 + 参考图(可选) | 720P/1080P | 2-10s | 指令编辑、风格转换、替换 |
+| **wan2.6-r2v-flash** | 参考生视频 | 参考图/视频(最多5个) + 文本 | 720P/1080P | 2-10s | 角色复刻表演 |
+
+> ⚠️ **Wan 2.7 使用 HTTP 调用**，DashScope SDK 暂不支持 wan2.7 模型。
+> ⚠️ Wan 2.7 全系列最高 **1080P**（非 4K），单段最长 **15 秒**。
 
 ---
 
@@ -23,15 +38,23 @@ description: AI video generation studio with script writing, storyboarding, char
 
 ### 短剧剧本结构
 
-一个 5-15 秒 AI 短剧的标准结构：
-
 ```
 【片名】一句话概括故事
-【时长】5s / 10s / 15s
+【时长】10s / 15s / ...（单段）或 N 分钟（多段拼接）
 【风格】3D卡通 / 写实电影 / 水墨 / 赛博朋克 / ...
 【角色】角色1：描述 | 角色2：描述 | ...
 【场景】主要场景描述
 【分镜】镜头1 → 镜头2 → 镜头3 → ...
+```
+
+### 长视频策略（>15 秒）
+
+Wan 2.7 单段最长 15 秒，制作长视频需分镜拆分：
+
+```
+3 分钟视频 = 12-18 个镜头 × 10-15 秒/段
+流程：剧本 → 分镜 → 逐段生成 → ffmpeg 拼接 → 配乐
+角色一致性：每个镜头使用相同的首帧参考图
 ```
 
 ### 分镜脚本格式
@@ -58,19 +81,18 @@ description: AI video generation studio with script writing, storyboarding, char
 氛围宁静温柔，电影质感，浅景深
 ```
 
+**Wan 2.7 多镜头叙事 Prompt（无需 shot_type 参数）：**
+```
+直接在 prompt 中用时间戳描述分镜：
+第1个镜头[0-3秒] 全景：雨夜的纽约街头，霓虹灯闪烁。
+第2个镜头[3-6秒] 中景：侦探进入老旧建筑，雨水打湿外套。
+第3个镜头[6-9秒] 特写：侦探眼神坚毅专注，远处传来警笛声。
+```
+
 **参考生视频（r2v）Prompt 公式（多角色）：**
 ```
-wan2.7: [视频1/图1的角色] + [动作/台词] + [视频2/图2的角色] + [反应/动作] + [环境/光影]
-wan2.6: character1 + [动作/台词] + character2 + [反应/动作] + [环境/光影]
-
-示例（wan2.7）：
-视频1坐在靠窗的木桌旁，弹奏着一把吉他，弹奏着舒缓的民谣。
-图3（一把吉他）被他抱在怀中。视频2坐在对面，微笑着看着他，
-窗外是午后温暖的阳光，咖啡厅里飘着咖啡豆的香气，氛围温馨
-
-示例（wan2.6）：
-character1坐在咖啡厅的木桌旁弹吉他，character2坐在对面微笑着倾听，
-午后的阳光从窗户洒进来，氛围温馨浪漫
+wan2.7: 视频1/图1的角色 + 动作/台词 + 视频2/图2的角色 + 反应 + 环境
+wan2.6: character1 + 动作/台词 + character2 + 反应 + 环境
 ```
 
 ---
@@ -86,17 +108,6 @@ character1坐在咖啡厅的木桌旁弹吉他，character2坐在对面微笑着
 | 3 | 3s | 近景 | 侧视 | 缓慢右摇 | 主角转头望向窗外，表情若有所思 |
 | 4 | 2s | 特写 | 平视 | 固定 | 咖啡杯中升起的袅袅热气 |
 | 5 | 5s | 中景→全景 | 平视 | 缓慢拉远 | 主角放下杯子，走向门口，镜头跟随拉远 |
-
-### 分镜生成指令
-
-```
-/video --script "帮我生成分镜脚本" \
-  --title "雨中相遇" \
-  --duration 10 \
-  --style "电影质感，日系小清新" \
-  --characters "女孩：撑伞，白裙，20岁 | 男孩：穿雨衣，背着吉他" \
-  --scene "东京街头，樱花飘落的春雨天"
-```
 
 ---
 
@@ -145,66 +156,101 @@ character1坐在咖啡厅的木桌旁弹吉他，character2坐在对面微笑着
 
 ```
 想从零开始生成 → t2v（文生视频）
-有一张图想动起来 → i2v（图生视频）
-有角色/风格参考 → r2v（参考生视频）
+有一张图想动起来 → i2v - 首帧生视频
+有首帧和尾帧图 → i2v - 首尾帧生视频
+有已有视频想续写 → i2v - 视频续写
+有参考视频/图复刻角色 → r2v（参考生视频，wan2.6-r2v）
+想编辑已有视频 → videoedit（指令式编辑）
 ```
 
-### 文生视频（t2v）
+### 文生视频（wan2.7-t2v）
 
 ```bash
-# 基础用法
-/video --mode t2v "prompt"
+# 基础用法 - 单镜头
+/video --mode t2v "近景，一只布偶猫坐在窗台上，午后阳光洒在它身上"
 
-# 完整参数
-/video --mode t2v "prompt" \
-  --model wan2.6-t2v \
-  --duration 10 \
-  --resolution 720P \
-  --ratio 16:9 \
-  --seed 42
+# 多镜头叙事 - 直接在 prompt 中描述
+/video --mode t2v \
+  "第1个镜头[0-3秒] 全景：森林深处，阳光透过树冠。
+   第2个镜头[3-6秒] 中景：一只布偶猫从草丛中探出头。
+   第3个镜头[6-9秒] 特写：猫的眼睛闪着好奇的光。" \
+  --duration 9 --resolution 1080P --ratio 16:9
+
+# 带音频
+/video --mode t2v "prompt" --audio https://example.com/bgm.mp3 --duration 10
+
+# 反向提示词
+/video --mode t2v "一只猫在花园" --negative-prompt "花朵,文字,水印"
 ```
 
-### 图生视频（i2v）
+### 图生视频（wan2.7-i2v）
 
 ```bash
-# 首帧生成
-/video --mode i2v "prompt" --image first_frame.jpg
+# 首帧生视频
+/video --mode i2v "prompt" --first first_frame.jpg --duration 10
 
-# 首尾帧控制（精确控制起止画面）
-/video --mode i2v "prompt" --first start.jpg --last end.jpg
+# 首尾帧生视频（精确控制起止画面）
+/video --mode i2v "prompt" --first start.jpg --last end.jpg --duration 10
+
+# 首帧 + 音频驱动
+/video --mode i2v "prompt" --first face.jpg --audio voice.mp3 --duration 10
+
+# 视频续写（基于已有视频生成后续）
+/video --mode i2v "一个女孩对镜自拍后背着书包出门" \
+  --first-clip clip1.mp4 --duration 10
+
+# 首段视频 + 尾帧续写
+/video --mode i2v "prompt" \
+  --first-clip clip1.mp4 --last end.jpg --duration 10
 ```
 
-### 参考生视频（r2v）
+### 参考生视频（wan2.6-r2v-flash）
 
-**wan2.7 角色引用方式：视频1、视频2、图1、图2...**
+> ⚠️ Wan 2.7 暂无独立 R2V 模型，当前使用 wan2.6-r2v-flash
+
 **wan2.6 角色引用方式：character1、character2...**
 
 ```bash
 # 单角色
-/video --mode r2v --ref character.mp4 "视频1在花园里散步"
+/video --mode r2v --ref character.mp4 \
+  "character1在花园里散步，享受阳光"
 
-# 多角色互动
+# 多角色互动（最多5个角色）
 /video --mode r2v \
   --ref girl.mp4 --ref boy.mp4 \
-  "视频1对视频2说：你好！视频2笑着回应"
-
-# 多角色 + 道具
-/video --mode r2v \
-  --ref char1.mp4 --ref char2.mp4 --ref guitar.jpg \
-  "视频1抱着图3弹奏，视频2在旁边倾听"
-
-# 多镜头叙事
-/video --mode r2v \
-  --ref storyboard.png \
-  "冒险故事，保持角色和场景一致" \
-  --shot-type multi --duration 10
-
-# 分镜脚本生成视频
-/video --mode r2v \
-  --ref char1.mp4 --ref char2.mp4 --ref background.jpg \
-  --first-frame opening.jpg \
-  "镜头1[全景]：图3的环境中，视频1走进画面。镜头2[中景]：视频2转身看到视频1，露出微笑。镜头3[近景]：两人对视，视频1说：好久不见。镜头4[特写]：两双手握在一起" \
+  "character1对character2说：你好！character2笑着回应" \
   --duration 10 --shot-type multi
+
+# 多角色 + 道具 + 背景
+/video --mode r2v \
+  --ref char1.mp4 --ref char2.mp4 --ref guitar.jpg --ref cafe.jpg \
+  "character1抱着character3弹奏，character2坐在对面倾听，背景是character4" \
+  --duration 10 --shot-type multi
+
+# 无声视频
+/video --mode r2v --ref character.mp4 \
+  "character1在跳舞" \
+  --duration 5 --shot-type multi --no-audio
+```
+
+### 视频编辑（wan2.7-videoedit）
+
+```bash
+# 风格转换
+/video --mode videoedit "将整个画面转换为黏土风格" \
+  --video original.mp4 --duration 5
+
+# 内容替换（参考图）
+/video --mode videoedit "将视频中女孩的衣服替换为图片中的衣服" \
+  --video original.mp4 --ref-image clothes.png --duration 5
+
+# 运镜调整
+/video --mode videoedit "在结尾添加缓慢推进效果" \
+  --video original.mp4 --duration 8
+
+# 保留原声
+/video --mode videoedit "添加雨天气效果" \
+  --video original.mp4 --audio-setting origin --duration 5
 ```
 
 ---
@@ -226,46 +272,89 @@ character1坐在咖啡厅的木桌旁弹吉他，character2坐在对面微笑着
   镜头3[4s] 近景 缓慢右摇：男孩走向女孩，两人相视而笑
 ```
 
-**步骤 2：准备素材**
-- 录制/准备女孩的参考视频 → `girl.mp4`
-- 录制/准备男孩的参考视频 → `boy.mp4`
-- 准备咖啡厅背景图 → `cafe.jpg`
-
-**步骤 3：生成视频**
-```bash
-/video --mode r2v \
-  --ref girl.mp4 --ref boy.mp4 --ref cafe.jpg \
-  "视频1坐在窗边看书，午后的阳光透过玻璃洒在她身上。
-   视频2推门进来，风铃响起，视频1抬头看向视频2。
-   视频2走向视频1，两人相视而笑。
+**步骤 2：wan2.7-t2v 一键生成**
+```
+/video --mode t2v \
+  "第1个镜头[0-3秒] 全景推近：女孩坐在咖啡厅窗边看书，午后的阳光透过玻璃洒在她身上。
+   第2个镜头[3-6秒] 中景固定：男孩推门进来，风铃响起，女孩抬头看向他。
+   第3个镜头[6-10秒] 近景缓慢右摇：男孩走向女孩，两人相视而笑。
    日系小清新风格，温暖柔和的光线，木质桌椅，窗边绿植" \
-  --duration 10 --shot-type multi --resolution 720P
+  --duration 10 --resolution 1080P --ratio 16:9
 ```
 
 ---
 
 ## 🔧 参数参考
 
+### wan2.7-t2v
+
 | 参数 | 说明 | 默认值 |
 |------|------|--------|
-| `--mode` | t2v / i2v / r2v | t2v |
-| `--model` | 模型名 | 自动匹配 |
-| `--ref` | 参考文件（可重复） | - |
-| `--image/--first/--last` | 首帧/尾帧 | - |
-| `--first-frame` | r2v首帧控制 | - |
-| `--duration` | 时长(秒) | 5 |
-| `--resolution` | 480P/720P/1080P | 720P |
-| `--ratio` | 16:9/9:16/1:1/4:3/3:4 | 16:9 |
-| `--shot-type` | single/multi | single |
+| `--mode` | t2v | t2v |
+| `--duration` | 时长 [2, 15] 秒 | 5 |
+| `--resolution` | 720P / 1080P | 1080P |
+| `--ratio` | 16:9 / 9:16 / 1:1 / 4:3 / 3:4 | 16:9 |
+| `--audio` | 音频 URL (wav/mp3, 2-30s) | 无（自动配音） |
+| `--negative-prompt` | 反向提示词 | 无 |
+| `--prompt-extend` | 智能改写 | true |
 | `--seed` | 随机种子 | random |
-| `--audio` | 配乐URL | - |
-| `--watermark` | AI水印 | off |
+| `--watermark` | AI 水印 | off |
 
-## 注意事项
+### wan2.7-i2v
 
-- 所有生成均为异步任务，提交后返回 task_id
-- 视频生成通常需要 1-5 分钟
-- 视频 URL 24 小时过期，及时下载
-- wan2.7 默认自动配乐，wan2.6 需显式开启
-- 参考素材每个文件只含一个角色
-- 多角色互动建议使用 wan2.7-r2v（效果最佳）
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--mode` | i2v | i2v |
+| `--first` | 首帧图像 URL | - |
+| `--last` | 尾帧图像 URL | - |
+| `--first-clip` | 首段视频 URL（续写用） | - |
+| `--audio` | 驱动音频 URL (wav/mp3, 2-30s) | 无（自动配音） |
+| `--duration` | 时长 [2, 15] 秒 | 5 |
+| `--resolution` | 720P / 1080P | 1080P |
+| `--negative-prompt` | 反向提示词 | 无 |
+
+### wan2.7-videoedit
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--mode` | videoedit | videoedit |
+| `--video` | 待编辑视频 URL | - |
+| `--ref-image` | 参考图像 URL（最多3张） | - |
+| `--duration` | 时长 [2, 10] 秒 | 输入视频时长 |
+| `--resolution` | 720P / 1080P | 1080P |
+| `--audio-setting` | auto / origin | auto |
+
+### wan2.6-r2v-flash
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--mode` | r2v | r2v |
+| `--ref` | 参考文件 URL（可重复，最多5个） | - |
+| `--duration` | 时长 [2, 10] 秒 | 5 |
+| `--size` | 1280*720 / 1920*1080 等 | 1920*1080 |
+| `--shot-type` | single / multi | single |
+| `--no-audio` | 无声视频 | 有声 |
+
+---
+
+## 📐 分辨率对照表
+
+| 档位 | 16:9 | 9:16 | 1:1 | 4:3 | 3:4 |
+|------|------|------|-----|-----|-----|
+| **720P** | 1280×720 | 720×1280 | 960×960 | 1104×832 | 832×1104 |
+| **1080P** | 1920×1080 | 1080×1920 | 1440×1440 | 1648×1248 | 1248×1648 |
+
+---
+
+## ⚠️ 注意事项
+
+- **Wan 2.7 使用 HTTP 调用**，SDK 暂不支持 wan2.7
+- 单段最长 **15 秒**（t2v/i2v），视频编辑最长 **10 秒**
+- 最高分辨率 **1080P**（非 4K）
+- 所有生成为异步任务，提交后返回 task_id
+- 视频 URL **24 小时**过期，及时下载
+- wan2.7-t2v **不需要** shot_type 参数，自然语言描述分镜即可
+- 反向提示词 wan2.7-t2v 和 wan2.7-i2v 均支持
+- 多角色互动使用 wan2.6-r2v-flash，最多 **5 个角色**
+- i2v 输出宽高比由**输入素材**（首帧/首视频）决定
+- 提示词需明确动作逻辑（如 "猫扑向狐狸" 而非 "猫和狐狸打架"）

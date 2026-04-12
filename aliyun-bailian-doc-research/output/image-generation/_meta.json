@@ -1,0 +1,10 @@
+{
+  "name": "image-generation",
+  "version": "2026-04-12",
+  "description": "阿里云百炼图像生成文档：千问文生图、万相文生图、图像生成与编辑",
+  "last_updated": "2026-04-12",
+  "sources": [
+    "https://help.aliyun.com/zh/model-studio/text-to-image"
+  ],
+  "files": ["SKILL.md"]
+}

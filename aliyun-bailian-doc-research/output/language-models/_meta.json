@@ -1,0 +1,19 @@
+{
+  "name": "language-models",
+  "version": "2026-04-12",
+  "description": "阿里云百炼语言模型文档：千问旗舰、第三方旗舰、高级特性（搜索、推理、上下文、缓存）",
+  "last_updated": "2026-04-12",
+  "sources": [
+    "https://help.aliyun.com/zh/model-studio/text-generation",
+    "https://help.aliyun.com/zh/model-studio/deep-thinking",
+    "https://help.aliyun.com/zh/model-studio/context-cache",
+    "https://help.aliyun.com/zh/model-studio/web-search"
+  ],
+  "files": [
+    "SKILL.md",
+    "docs/models.md",
+    "docs/deep-thinking.md",
+    "docs/context-cache.md",
+    "docs/web-search.md"
+  ]
+}

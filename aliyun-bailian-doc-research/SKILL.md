@@ -1,494 +1,261 @@
 ---
 name: aliyun-bailian-doc-research
-description: 阿里云百炼文档研究方法，包括如何系统性地挖掘独立文档页面、验证链接有效性、提取模型信息和构建完整知识体系。
+description: 阿里云百炼文档研究与更新方法，包括文档抓取、URL 变更应对、知识提取、输出文档生成。
 homepage: https://help.aliyun.com/zh/model-studio
 metadata:
   {
     "openclaw":
       {
         "emoji": "📚",
-        "requires": { "tools": ["web_search", "web_fetch"] },
+        "requires": { "tools": ["web_fetch"] },
         "install": [],
       },
   }
 ---
 
-# 阿里云百炼文档研究方法 (Wan 2.7 Integrated)
+# 阿里云百炼文档研究 — 抓取与更新指南
 
-**版本**: v1.1  
-**更新时间**: 2026-04-04  
-**适用场景**: 系统性研究阿里云百炼平台文档，跟踪最新模型发布 (如 Wan 2.7)
+**版本**: v3.0
+**更新时间**: 2026-04-12
+**适用场景**: 抓取阿里云百炼平台最新文档，生成结构化的本地 SKILL.md 文档
 
 ---
 
 ## 🎯 目标
 
-建立一套**可复用的文档研究方法**，用于：
-1. 系统性挖掘所有独立文档页面
-2. 验证链接有效性
-3. 提取结构化模型信息
-4. 构建完整知识体系
+从官方文档抓取最新信息，生成 `output/{类别}/SKILL.md` 文件。
 
 ---
 
-## 📋 研究流程
+## 🔗 根目录与备用发现机制
 
-### 阶段 1：核心文档定位 (15 分钟)
+> **核心原则：404 是常态。官方文档 URL 经常变化，但根目录永远不会变。**
 
-**目标**: 找到文档体系的入口页面
+### 根目录（不变）
 
-**步骤**:
+| 根目录 | 说明 |
+|--------|------|
+| `https://help.aliyun.com/` | 阿里云帮助中心根目录 |
+| `https://www.aliyun.com/` | 阿里云官网首页 |
+| `https://help.aliyun.com/zh/model-studio/` | 百炼文档首页 |
 
-1. **搜索模型大全页面**
-   ```
-   阿里云百炼 模型大全 site:help.aliyun.com
-   ```
-   - 目标 URL: `https://help.aliyun.com/zh/model-studio/models`
-   - 这是**最核心的页面**，包含所有模型列表
+### URL 变更应对策略
 
-2. **搜索开发文档总览**
-   ```
-   阿里云百炼 开发文档 site:help.aliyun.com
-   ```
-   - 目标 URL: `https://help.aliyun.com/zh/model-studio/development-documentation/`
-   - 了解文档体系结构
+当已知文档 URL 返回 404 时，**按以下顺序尝试**：
 
-3. **搜索用户指南**
-   ```
-   阿里云百炼 用户指南 site:help.aliyun.com
-   ```
-   - 目标 URL: `https://help.aliyun.com/zh/model-studio/model-user-guide/`
-   - 了解使用方法
+#### 策略 1：访问上级目录
 
-**工具**: `web_search` (count: 10)
+```
+已知 URL: https://help.aliyun.com/zh/model-studio/qwen-tts
+→ 404 时访问: https://help.aliyun.com/zh/model-studio/
+→ 在页面中搜索新链接
+```
 
-**输出**: 核心文档 URL 列表
+#### 策略 2：访问文档首页
 
----
+```
+访问: https://help.aliyun.com/zh/model-studio/
+→ 这是百炼文档的入口页面，包含所有子文档的导航链接
+→ 从中提取最新的各能力文档 URL
+```
 
-### 阶段 2：专项能力文档挖掘 (30 分钟)
+#### 策略 3：搜索阿里云官网
 
-**目标**: 为每个能力领域找到独立文档页面
+```
+访问: https://www.aliyun.com/
+→ 使用站内搜索："百炼" 或 "model-studio" 或具体功能名称
+→ 或直接访问: https://www.aliyun.com/search?keywords=百炼+语音合成
+```
 
-**步骤**:
+#### 策略 4：搜索帮助中心
 
-1. **按能力类别搜索**
+```
+访问: https://help.aliyun.com/
+→ 使用帮助中心搜索功能
+→ 或在浏览器中使用: site:help.aliyun.com {关键词}
+```
 
-   对每个能力类别执行搜索：
+### 已知有效入口页面
 
-   ```
-   # 图像生成
-   阿里云百炼 图像生成 文生图 独立文档 site:help.aliyun.com
-   
-   # 视频生成
-   阿里云百炼 视频生成 文生视频 独立文档 site:help.aliyun.com
-   
-   # 语音处理
-   阿里云百炼 语音识别 语音合成 TTS ASR 独立文档 site:help.aliyun.com
-   
-   # 视觉理解
-   阿里云百炼 视觉理解 VL 独立文档 site:help.aliyun.com
-   
-   # 全模态
-   阿里云百炼 Omni 全模态 独立文档 site:help.aliyun.com
-   
-   # Embedding
-   阿里云百炼 embedding 向量 独立文档 site:help.aliyun.com
-   ```
+| 页面 | URL | 说明 |
+|------|-----|------|
+| 百炼文档首页 | `https://help.aliyun.com/zh/model-studio/` | ⭐ 最重要入口 |
+| 模型列表 | `https://help.aliyun.com/zh/model-studio/models` | 所有模型规格 |
+| 快速入门 | `https://help.aliyun.com/zh/model-studio/quick-start/` | 入门指南 |
+| API Key | `https://help.aliyun.com/zh/model-studio/get-api-key/` | 获取密钥 |
+| 安装 SDK | `https://help.aliyun.com/zh/model-studio/install-sdk/` | SDK 安装 |
+| 计费说明 | `https://help.aliyun.com/zh/model-studio/billing-for-model-studio/` | 价格 |
 
-2. **识别独立文档页面**
-
-   **有效独立文档特征**:
-   - ✅ URL 格式：`/zh/model-studio/{能力名称}/` 或 `/zh/model-studio/{具体功能}`
-   - ✅ 标题包含完整能力名称
-   - ✅ 内容包含完整的功能介绍、API 参考、使用指南
-   - ❌ 避免：URL 包含 `#` 锚点的链接
-
-   **示例**:
-   - ✅ `https://help.aliyun.com/zh/model-studio/image-generation/` (独立页面)
-   - ✅ `https://help.aliyun.com/zh/model-studio/use-video-generation` (独立页面)
-   - ❌ `https://help.aliyun.com/zh/model-studio/models#96837528cdqes` (锚点链接，无效)
-
-3. **验证文档有效性**
-
-   对每个找到的 URL 执行：
-   ```
-   web_fetch(url="找到的 URL", extractMode="markdown", maxChars=5000)
-   ```
-
-   **验证标准**:
-   - ✅ 返回状态码 200
-   - ✅ 内容包含完整的功能介绍
-   - ✅ 包含 API 调用示例或价格信息
-   - ❌ 如果返回 404 或内容过少，标记为无效
-
-**工具**: `web_search` + `web_fetch` 组合
-
-**输出**: 专项能力独立文档 URL 列表（已验证）
+**这些入口页面几乎不会变化**，即使子文档 URL 变了，从入口页面总能找到新链接。
 
 ---
 
-### 阶段 3：API 文档挖掘 (20 分钟)
+## 📁 输出目录结构
 
-**目标**: 找到各能力的 API 参考文档
-
-**步骤**:
-
-1. **搜索 API 参考**
-
-   对每个能力搜索 API 文档：
-
-   ```
-   # 图像 API
-   阿里云百炼 图像生成 API 参考 site:help.aliyun.com
-   
-   # 视频 API
-   阿里云百炼 视频生成 API 参考 site:help.aliyun.com
-   
-   # 语音 API
-   阿里云百炼 语音识别 API 参考 site:help.aliyun.com
-   ```
-
-2. **识别 API 文档特征**
-
-   **API 文档特征**:
-   - ✅ URL 包含 `api-reference` 或 `api`
-   - ✅ 标题包含 "API 参考"
-   - ✅ 内容包含请求参数、响应示例、错误码
-
-   **示例**:
-   - `https://help.aliyun.com/zh/model-studio/qwen-image-api`
-   - `https://help.aliyun.com/zh/model-studio/text-to-video-api-reference`
-
-3. **验证并记录**
-
-   使用 `web_fetch` 验证每个 API 文档
-
-**输出**: API 参考文档列表
+```
+output/
+├── INDEX.md                              ← 总索引
+├── language-models/                      ← 语言模型
+├── video-generation/                     ← 视频生成
+├── image-generation/                     ← 图像生成
+├── tts/                                  ← 语音合成
+├── asr/                                  ← 语音识别
+├── embedding/                            ← 向量模型
+├── vision/                               ← 视觉理解
+├── tool-calls/                           ← 工具调用
+├── batch/                                ← Batch 批量
+├── rate-limit/                           ← 限流
+└── error-codes/                          ← 错误码
+```
 
 ---
 
-### 阶段 4：使用指南挖掘 (15 分钟)
+## 📋 抓取流程
 
-**目标**: 找到各能力的使用指南和最佳实践
+### 第 0 步：确认入口（每次必做）
 
-**步骤**:
+```python
+# 先访问百炼文档首页，确认导航结构未变
+web_fetch(url="https://help.aliyun.com/zh/model-studio/", maxChars=20000)
+```
 
-1. **搜索使用指南**
+从首页提取当前各能力文档的最新 URL。
 
-   ```
-   # 图像使用
-   阿里云百炼 图像编辑 使用指南 site:help.aliyun.com
-   
-   # 视频使用
-   阿里云百炼 视频生成 使用方法 site:help.aliyun.com
-   
-   # 语音使用
-   阿里云百炼 语音合成 使用指南 site:help.aliyun.com
-   ```
+### 第 1 步：批量抓取官方文档
 
-2. **识别使用指南特征**
+使用 `web_fetch` 抓取所有核心文档。如果某个 URL 返回 404，**不要跳过**，执行第 0 步从入口页面找到新 URL。
 
-   **使用指南特征**:
-   - ✅ URL 包含 `guide`、`use`、`how-to`
-   - ✅ 标题包含 "使用指南"、"使用方法"、"最佳实践"
-   - ✅ 内容包含操作步骤、示例代码、场景推荐
+```python
+# 核心文档（高优先级）
+web_fetch(url="https://help.aliyun.com/zh/model-studio/text-generation", maxChars=20000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/vision", maxChars=15000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/embedding", maxChars=15000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/rate-limit", maxChars=15000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/error-code", maxChars=15000)
 
-   **示例**:
-   - `https://help.aliyun.com/zh/model-studio/qwen-image-edit-guide`
-   - `https://help.aliyun.com/zh/model-studio/text-to-video-guide/`
+# 其他文档（中优先级）
+web_fetch(url="https://help.aliyun.com/zh/model-studio/deep-thinking", maxChars=15000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/context-cache", maxChars=15000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/web-search", maxChars=15000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/qwen-tts", maxChars=15000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/text-to-image", maxChars=15000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/batch-interfaces-compatible-with-openai/", maxChars=15000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/tool-calls", maxChars=15000)
+```
 
-**输出**: 使用指南列表
+### 第 2 步：提取关键信息
 
----
+从每个页面提取：
+1. **模型列表** — 模型名称、特点、支持的功能
+2. **快速开始代码** — Python/curl 示例
+3. **参数表格** — 关键参数、取值范围、说明
+4. **注意事项** — 有效期、SDK版本要求、地域差异
+5. **支持的地域** — 北京/新加坡/全球
 
-### 阶段 5：信息提取与结构化 (30 分钟)
+### 第 3 步：生成 SKILL.md
 
-**目标**: 从文档中提取结构化信息
-
-**步骤**:
-
-1. **提取模型列表**
-
-   从模型大全页面提取：
-   ```markdown
-   | 模型名称 | 类型 | 上下文 | 价格 | 地域 | 状态 |
-   |---------|------|--------|------|------|------|
-   | Qwen3-Max | 文本 | 256K | ¥2.5-15/¥10-60 | 北京 | ✅ |
-   ```
-
-2. **提取能力矩阵**
-
-   从各独立文档提取功能支持：
-   ```markdown
-   | 能力 | 支持模型 | 文档链接 |
-   |------|---------|---------|
-   | Think 模式 | Qwen3-Max, Qwen3.5-Plus | [详情](URL) |
-   | 联网搜索 | Qwen3.5 系列 | [详情](URL) |
-   ```
-
-3. **提取价格信息**
-
-   从定价文档提取：
-   ```markdown
-   | 模型 | 输入价格 | 输出价格 | 免费额度 |
-   |------|---------|---------|---------|
-   | Qwen3.5-Plus | ¥0.8/百万 | ¥4.8/百万 | 100 万 |
-   ```
-
-4. **提取地域支持**
-
-   从地域文档提取：
-   ```markdown
-   | 地域 | Base URL | API Key | 支持模型 |
-   |------|---------|--------|---------|
-   | 北京 | dashscope.aliyuncs.com | 独立 | 全部 |
-   | 新加坡 | dashscope-intl.aliyuncs.com | 独立 | 大部分 |
-   ```
-
-**工具**: `web_fetch` + 手动整理
-
-**输出**: 结构化信息表格
-
----
-
-### 阶段 6：链接验证与勘误 (15 分钟)
-
-**目标**: 验证所有链接有效性，建立勘误表
-
-**步骤**:
-
-1. **批量验证链接**
-
-   对每个收集到的 URL 执行：
-   ```
-   web_fetch(url="URL", extractMode="markdown", maxChars=1000)
-   ```
-
-2. **记录验证结果**
-
-   ```markdown
-   | URL | 状态 | 备注 |
-   |-----|------|------|
-   | https://.../image-generation/ | ✅ 有效 | 独立页面 |
-   | https://.../models#xxxxx | ❌ 无效 | 锚点链接 |
-   ```
-
-3. **建立勘误表**
-
-   记录所有无效链接和正确链接：
-   ```markdown
-   ## 无效链接（已移除）
-   ❌ https://help.aliyun.com/zh/model-studio/models#96837528cdqes
-   ✅ 更正：https://help.aliyun.com/zh/model-studio/image-generation/
-   ```
-
-**输出**: 链接验证报告
-
----
-
-## 🛠️ 工具使用技巧
-
-### web_search 技巧
-
-1. **精确搜索**
-   ```
-   阿里云百炼 {能力名称} 独立文档 site:help.aliyun.com
-   ```
-
-2. **排除锚点链接**
-   ```
-   阿里云百炼 {能力} -"#" site:help.aliyun.com
-   ```
-
-3. **查找 API 文档**
-   ```
-   阿里云百炼 {能力} API 参考 site:help.aliyun.com
-   ```
-
-### web_fetch 技巧
-
-1. **快速验证**
-   ```python
-   web_fetch(url="URL", extractMode="markdown", maxChars=1000)
-   ```
-   - `maxChars=1000`: 快速验证页面是否有效
-
-2. **完整提取**
-   ```python
-   web_fetch(url="URL", extractMode="markdown", maxChars=20000)
-   ```
-   - `maxChars=20000`: 提取完整内容
-
-3. **提取模式选择**
-   - `extractMode="markdown"`: 结构化内容（推荐）
-   - `extractMode="text"`: 纯文本（备用）
-
----
-
-## 📊 信息组织模板
-
-### 主文档结构
+每个类别的 SKILL.md 标准结构：
 
 ```markdown
-# 阿里云百炼全系列能力清单
+# {类别名称}
 
-## 📊 信息概览
-[模型统计表]
+> 更新时间：{日期}
+> 来源：{官方URL}
 
-## 🔗 官方信息源
-[核心文档链接表格]
+---
 
-## 🎨 图像生成与编辑
-[文生图模型表格]
-[图像编辑模型表格]
+## 概述
 
-## 🎬 视频生成与编辑
-[文生视频模型表格]
-[图生视频模型表格]
+**Base URL：**
+- 北京：`...`
+- 新加坡：`...`
 
-## 🎤 语音处理
-[语音识别模型表格]
-[语音合成模型表格]
+---
 
-## 🔮 全模态模型
-[Omni 系列表格]
+## 模型矩阵
 
-## 👁️ 视觉理解
-[VL 系列表格]
+| 模型 | 特点 | 适用场景 |
 
-## 📝 更新日志
-[版本记录表格]
+---
+
+## 快速开始
+
+### Python
+### curl
+
+---
+
+## 关键参数
+
+| 参数 | 说明 | 取值 |
+
+---
+
+## 支持的模型
+
+### 北京地域 / 新加坡地域
+
+---
+
+## 注意事项
 ```
 
-### 模型表格模板
+### 第 4 步：生成 _meta.json
 
-```markdown
-| 模型 | 上下文 | Think | 搜索 | 多模态 | 价格 | 地域 | 文档 |
-|------|--------|-------|------|--------|------|------|------|
-| 模型名 | 256K | ✅ | ✅ | ❌ | ¥1/¥4 | 北京 | [详情](URL) |
+```json
+{
+  "name": "{类别名}",
+  "version": "{日期}",
+  "description": "{描述}",
+  "last_updated": "{日期}",
+  "sources": ["{官方URL}"],
+  "files": ["SKILL.md"]
+}
 ```
 
----
+### 第 5 步：更新 INDEX.md
 
-## ✅ 质量检查清单
-
-### 链接验证
-
-- [ ] 所有链接都是独立文档页面（非锚点）
-- [ ] 所有链接都已通过 `web_fetch` 验证
-- [ ] 无效链接已移除或更正
-
-### 信息完整性
-
-- [ ] 所有核心能力都有独立文档链接
-- [ ] 所有模型都有价格信息
-- [ ] 所有模型都有地域支持说明
-- [ ] 所有能力都有 API 文档链接
-
-### 信息准确性
-
-- [ ] 模型参数已从官方文档核实
-- [ ] 价格信息已核对最新版本
-- [ ] 地域支持已确认
+更新总索引，标注所有来源 URL 和状态。
 
 ---
 
-## 🔄 更新维护
+## ⚠️ 注意事项
 
-### 每周更新 (Cron)
+### 信息真实性
 
-- 检查核心文档是否有更新
-- 验证链接有效性
-- 记录更新日志
+- **只写官方文档中明确提到的内容**
+- **不要基于已有知识推测**
+- 如果官方文档没有提到某个模型或功能，不要写入
 
-### 每月更新
+### 404 处理
 
-- 搜索新发布的模型
-- 检查是否有新的独立文档页面
-- 更新模型对比表格
+1. 已知 URL 返回 404 → 访问 `https://help.aliyun.com/zh/model-studio/` 找到新 URL
+2. 如果入口页面也变了 → 访问 `https://help.aliyun.com/` 搜索"百炼"
+3. 如果搜索也失败 → 访问 `https://www.aliyun.com/` 搜索
+4. **根目录 https://help.aliyun.com/ 和 https://www.aliyun.com/ 永远不会变**
 
-### 每季度更新
+### 时效性
 
-- 全面审查文档结构
-- 清理失效链接
-- 更新推荐方案
-
----
-
-## 📋 输出文档清单
-
-完成研究后，应创建以下文档：
-
-1. **主文档**: `aliyun-bailian-capabilities.md`
-   - 完整能力清单
-   - 模型对比表格
-   - 官方文档链接
-
-2. **索引文档**: `aliyun-bailian-document-index.md`
-   - 独立文档完整列表
-   - 按能力分类
-   - 文档统计
-
-3. **验证文档**: `link-verification.md`
-   - 链接验证报告
-   - 无效链接勘误
-   - 更正记录
-
-4. **方法文档**: `research-methodology.md` (本文档)
-   - 研究方法记录
-   - 工具使用技巧
-   - 最佳实践
+- 每个文档标注更新日期和来源 URL
+- 模型列表、限流条件等数据经常变化，以官方最新为准
 
 ---
 
-## 💡 最佳实践
+## 📊 当前文档状态（2026-04-12）
 
-### 搜索技巧
+| 类别 | 文件数 | 状态 | 来源 |
+|------|--------|------|------|
+| language-models | 6 | ✅ | text-generation, deep-thinking, context-cache, web-search |
+| video-generation | 18 | ✅ | video-generation, Wan 2.7 API |
+| image-generation | 2 | ✅ | text-to-image |
+| tts | 2 | ✅ | qwen-tts |
+| asr | 2 | ✅ | speech-recognition |
+| embedding | 2 | ✅ | embedding |
+| vision | 2 | ✅ | vision |
+| tool-calls | 2 | ✅ | tool-calls, function-calling |
+| batch | 2 | ✅ | batch-interfaces |
+| rate-limit | 2 | ✅ | rate-limit |
+| error-codes | 2 | ✅ | error-code |
+| finetuning | 0 | ⚠️ 待补充 | finetuning |
 
-1. **始终使用 `site:help.aliyun.com`** 限制搜索范围
-2. **使用 "独立文档" 关键词** 过滤锚点链接
-3. **搜索 10 条结果** 确保覆盖全面
-
-### 验证技巧
-
-1. **先快速验证** (maxChars=1000) 确认页面有效
-2. **再完整提取** (maxChars=20000) 获取完整信息
-3. **记录验证状态** 便于后续维护
-
-### 组织技巧
-
-1. **按能力分类** 组织文档
-2. **使用表格** 呈现对比信息
-3. **提供直接链接** 方便查阅
-
----
-
-## 📞 常见问题
-
-### Q: 如何判断一个链接是独立文档还是锚点链接？
-
-**A**: 
-- ✅ 独立文档：`/zh/model-studio/image-generation/`
-- ❌ 锚点链接：`/zh/model-studio/models#96837528cdqes`
-
-**判断标准**: URL 是否包含 `#` 符号
-
-### Q: 如何快速找到某个能力的所有相关文档？
-
-**A**: 使用组合搜索：
-```
-阿里云百炼 {能力名称} (API OR 使用 OR 指南) site:help.aliyun.com
-```
-
-### Q: 如何验证找到的文档是否有效？
-
-**A**: 使用 `web_fetch` 提取内容：
-- 如果返回 200 且内容完整 → ✅ 有效
-- 如果返回 404 或内容过少 → ❌ 无效
-
----
-
-**文档状态**: ✅ 已完成  
-**适用版本**: 阿里云百炼 2026 版  
-**维护人**: 胖福
+**总计：43 个文件，约 296KB**

@@ -1,0 +1,42 @@
+{
+  "sources": {
+    "阿里云万相文生图 API": {
+      "last_check": "2026-04-06T23:21:01.932834",
+      "content_hash": "4e18b5db847013b3df7b9850d8209a1d",
+      "last_updated": "2026-04-06T23:21:01.932834"
+    },
+    "阿里云万相文生视频 API": {
+      "last_check": "2026-04-06T23:21:01.932834",
+      "content_hash": "805c211f037aa309554871b752deda32",
+      "last_updated": "2026-04-06T23:21:01.932834"
+    },
+    "阿里云万相参考生视频 API": {
+      "last_check": "2026-04-06T23:21:01.932834",
+      "content_hash": "52df14df2d9e90f658f7f7643451d6aa",
+      "last_updated": "2026-04-06T23:21:01.932834"
+    },
+    "Apatero Prompt Guide": {
+      "last_check": "2026-04-06T23:21:01.932834",
+      "content_hash": "018fbd1fd319d533ca505f6a7780d2b9",
+      "last_updated": "2026-04-06T23:21:01.932834"
+    },
+    "Runway Prompt Guide": {
+      "last_check": "2026-04-06T23:21:01.932834",
+      "content_hash": "1bb36bc9c7ee2e4c17ab5547d6669d5a",
+      "last_updated": "2026-04-06T23:21:01.932834"
+    },
+    "Awesome AI Video Prompts": {
+      "last_check": "2026-04-06T23:21:01.932834",
+      "content_hash": "e969c76120930339ab606d06d405684d",
+      "last_updated": "2026-04-06T23:21:01.932834"
+    },
+    "阿里云 Wan 2.6 Guide": {
+      "last_check": "2026-04-06T23:21:01.932834",
+      "content_hash": "416da4cb2d74d9cef1197a20e8933cfb",
+      "last_updated": "2026-04-06T23:21:01.932834"
+    }
+  },
+  "prompts_added": 0,
+  "scenes_added": 0,
+  "last_full_research": null
+}

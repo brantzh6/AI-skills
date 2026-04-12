@@ -1,0 +1,11 @@
+{
+  "name": "tool-calls",
+  "version": "2026-04-12",
+  "description": "阿里云百炼工具调用文档：Function Calling、Assistant API、联网搜索工具",
+  "last_updated": "2026-04-12",
+  "sources": [
+    "https://help.aliyun.com/zh/model-studio/tool-calls",
+    "https://help.aliyun.com/zh/model-studio/function-calling"
+  ],
+  "files": ["SKILL.md"]
+}

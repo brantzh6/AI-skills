@@ -1,6 +1,6 @@
 ---
 name: aliyun-bailian-sync
-description: 定期同步阿里云百炼平台最新模型信息到 Notion，包括价格、功能、新模型发布等。支持每周自动更新和变更检测。
+description: 定期同步阿里云百炼平台最新模型信息 (含 Wan 2.7 更新) 到 Notion，包括价格、功能、新模型发布等。支持每周自动更新和变更检测。
 homepage: https://help.aliyun.com/zh/model-studio
 metadata:
   {
@@ -27,6 +27,11 @@ metadata:
       },
   }
 ---
+
+# 阿里云百炼信息同步 (Wan 2.7 Ready)
+
+**版本**: v1.1  
+**更新时间**: 2026-04-04
 
 # 阿里云百炼信息同步 Skill
 
