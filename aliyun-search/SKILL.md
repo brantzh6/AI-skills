@@ -1,6 +1,6 @@
 # 阿里云搜索 (aliyun-search)
 
-> 提供两种阿里云搜索能力：模型内置联网搜索 + OpenSearch 企业级搜索
+> 提供三种阿里云搜索能力：模型内置联网搜索 + OpenSearch 企业级搜索 + 商品搜索推荐
 
 ## 配置
 
@@ -12,7 +12,7 @@ cp .env.example .env
 
 `.env` 文件内容：
 ```env
-# 百炼 API Key（联网搜索必需）
+# 百炼 API Key（联网搜索、商品搜索必需）
 DASHSCOPE_API_KEY=sk-xxx
 
 # OpenSearch 配置（企业级搜索必需）
@@ -54,10 +54,32 @@ python aliyun_search.py opensearch "AI搜索开放平台可以做什么"
 python aliyun_search.py opensearch "如何搭建RAG链路" -s ops-qwen-plus -i my_rag_index
 ```
 
+### 能力三：商品搜索推荐
+
+```bash
+# 简单搜索
+python aliyun_search.py product "无线蓝牙耳机"
+
+# 指定类目、价格范围、排序
+python aliyun_search.py product "机械键盘" -c "数码配件" -p "200-500" -s relevance
+
+# 价格从低到高排序
+python aliyun_search.py product "平板电脑" -p "1000-3000" -s price_asc
+
+# 销量优先，返回 10 个商品
+python aliyun_search.py product "电动牙刷" -s sales -n 10
+```
+
+排序方式：
+- `relevance`（默认）：综合相关度
+- `price_asc`：价格从低到高
+- `price_desc`：价格从高到低
+- `sales`：销量优先
+
 ## Python API 调用
 
 ```python
-from aliyun_search import web_search, opensearch_query
+from aliyun_search import web_search, opensearch_query, product_search
 
 # 联网搜索
 result = web_search("近期美股表现", model="qwen-plus")
@@ -66,6 +88,12 @@ result = web_search("近期美股表现", model="qwen-plus")
 result = opensearch_query("产品功能介绍")
 print(result["answer"])
 print(result["sources"])  # 参考文档列表
+
+# 商品搜索推荐
+result = product_search("无线蓝牙耳机", price_range="100-500", sort_by="sales")
+for product in result.get("products", []):
+    print(f"{product['name']} - ¥{product['price']}")
+print(result.get("recommendations"))  # 推荐摘要
 ```
 
 ## 依赖

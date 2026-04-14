@@ -1,7 +1,7 @@
 # 阿里云搜索产品体系
 
-> 更新时间：2026-04-12
-> 来源：https://help.aliyun.com/zh/model-studio/web-search、https://help.aliyun.com/zh/open-search/
+> 更新时间：2026-04-15
+> 来源：https://help.aliyun.com/zh/model-studio/web-search、https://help.aliyun.com/zh/open-search/、https://www.aliyun.com/product/opensearch
 
 ---
 
@@ -140,7 +140,63 @@ response = client.responses.create(
 
 ---
 
-## 四、搜索产品对比
+## 四、商品搜索推荐
+
+基于 OpenSearch 行业算法版（电商零售）的商品搜索推荐能力，结合百炼模型联网搜索，提供结构化商品对比与推荐。
+
+### 核心能力
+
+| 能力 | 说明 |
+|------|------|
+| 语义理解 | 行业分词、同义词、拼写纠错、词权重、实体识别、类目预测 |
+| 个性化排序 | 基于深度学习的排序模型，支持 relevance/price/sales 等多维度排序 |
+| 商品结构化 | 自动提取品牌、价格、评分、销量、特点等信息 |
+| 智能推荐 | 性价比之选、品质之选、实惠之选等多维度推荐 |
+
+### 使用方式
+
+```python
+# 商品搜索推荐
+result = product_search(
+    "无线蓝牙耳机",
+    price_range="100-500",
+    sort_by="relevance",  # relevance/price_asc/price_desc/sales
+    limit=5
+)
+
+# 返回结构
+{
+    "search_query": "无线蓝牙耳机",
+    "total_results": 12840,
+    "products": [
+        {
+            "name": "商品名称",
+            "brand": "品牌",
+            "price": 399,
+            "rating": 4.7,
+            "sales_count": "月销2.3万+",
+            "features": ["主动降噪", "10mm动圈单元"],
+            "recommendation_reason": "推荐理由"
+        }
+    ],
+    "recommendations": {
+        "best_value": "性价比之选",
+        "best_quality": "品质之选",
+        "budget_pick": "实惠之选"
+    }
+}
+```
+
+### 应用场景
+
+- 电商平台搜索
+- 商品比价推荐
+- 购物决策辅助
+- 价格趋势分析
+
+---
+
+## 五、搜索产品对比
 
 | 产品 | 类型 | 特点 | 适用场景 | 费用 |
 |------|------|------|----------|------|
@@ -150,7 +206,7 @@ response = client.responses.create(
 
 ---
 
-## 五、选型建议
+## 六、选型建议
 
 | 场景 | 推荐方案 |
 |------|----------|
@@ -161,3 +217,4 @@ response = client.responses.create(
 | 自定义 RAG 链路 | OpenSearch AI搜索开放平台 |
 | 大规模向量检索 | OpenSearch 向量检索版 |
 | 电商/内容社区搜索 | OpenSearch 行业算法版 |
+| 商品搜索推荐 | 联网搜索 + 结构化输出 |
