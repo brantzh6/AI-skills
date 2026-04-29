@@ -1,11 +1,49 @@
 ---
 name: video-studio
-description: AI video generation studio with script writing, storyboarding, character management, and prompt engineering for Alibaba Cloud Wan 2.7.
+description: AI video generation studio with script writing, storyboarding, character management, and prompt engineering for Alibaba Cloud HappyHorse 1.0 & Wan 2.7.
 ---
 
 # Video Studio 🎬
 
-完整的 AI 视频创作工作室。从剧本到成片的完整工作流，基于阿里云百炼 Wan 2.7 系列。
+完整的 AI 视频创作工作室。从剧本到成片的完整工作流，支持 **HappyHorse 1.0 全系列** 和 **Wan 2.7 系列**。
+
+---
+
+## 🆕 HappyHorse 1.0 全系列（最新）
+
+HappyHorse 1.0 是阿里云百炼最新一代视频模型，支持北京/新加坡地域，异步调用（创建任务 → 轮询获取），task_id 有效期 24 小时。
+
+### HappyHorse 1.0 模型矩阵
+
+| 模型 | 功能 | 模型名 | 时长 | 分辨率 | 特色 |
+|------|------|--------|------|--------|------|
+| **文生视频** | 文本 → 视频 | `happyhorse-1.0-t2v` | 3-15s | 720P/1080P | 物理真实、运动流畅 |
+| **图生视频** | 首帧图 → 视频 | `happyhorse-1.0-i2v` | 3-15s | 720P/1080P | 首帧引导，宽高比自动跟随输入 |
+| **参考生视频** | 多参考图 → 视频 | `happyhorse-1.0-r2v` | 3-15s | 720P/1080P | 支持 1-9 张参考图，characterN 指代 |
+| **视频编辑** | 视频+指令/参考图 → 视频 | `happyhorse-1.0-video-edit` | 3-15s | 720P/1080P | 风格变换、局部替换、声音控制 |
+
+### HappyHorse 通用调用规范
+
+```
+Endpoint: POST https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis
+Headers: X-DashScope-Async: enable（必须）
+查询结果: GET https://dashscope.aliyuncs.com/api/v1/tasks/{task_id}
+视频格式: MP4（H.264 编码），24fps
+视频 URL 有效期: 24 小时，需及时下载
+```
+
+### HappyHorse 与 Wan 2.7 对比
+
+| 维度 | HappyHorse 1.0 | Wan 2.7 |
+|------|---------------|---------|
+| 最短时长 | 3 秒 | 2 秒 |
+| 最长时长 | 15 秒 | 15 秒（videoedit 10 秒） |
+| R2V 参考图 | 1-9 张 | 1-5 张（wan2.6-r2v-flash） |
+| 视频编辑 | 支持（最长 60s 输入） | 支持（最长 10 秒输出） |
+| 音频驱动 | 不支持 | 支持（t2v/i2v） |
+| 首尾帧 | 不支持 | 支持（i2v） |
+| 视频续写 | 不支持 | 支持（i2v --first-clip） |
+| 水印控制 | 支持（watermark 参数） | 支持（watermark 参数） |
 
 ## 核心能力
 
@@ -20,17 +58,29 @@ description: AI video generation studio with script writing, storyboarding, char
 
 ---
 
-## 📋 模型选型（Wan 2.7 全系列）
+## 📋 模型选型
+
+### HappyHorse 1.0 全系列（最新一代）
 
 | 模型 | 功能 | 输入 | 分辨率 | 时长 | 首选场景 |
 |------|------|------|--------|------|---------|
-| **wan2.7-t2v** ⭐ | 文生视频 | 文本 + 音频(可选) | 720P/1080P | 2-15s | 从零生成视频 |
-| **wan2.7-i2v** ⭐ | 图生视频 | 首帧/首尾帧/首段视频 + 音频(可选) | 720P/1080P | 2-15s | 图片动起来、过渡、续写 |
-| **wan2.7-videoedit** ⭐ | 视频编辑 | 视频 + 文本指令 + 参考图(可选) | 720P/1080P | 2-10s | 指令编辑、风格转换、替换 |
+| **happyhorse-1.0-t2v** ⭐ | 文生视频 | 文本 prompt | 720P/1080P | 3-15s | 从零生成视频，物理真实、运动流畅 |
+| **happyhorse-1.0-i2v** ⭐ | 图生视频 | 首帧图 + 文本(可选) | 720P/1080P | 3-15s | 图片动起来，宽高比自动跟随首帧 |
+| **happyhorse-1.0-r2v** ⭐ | 参考生视频 | 1-9张参考图 + 文本 | 720P/1080P | 3-15s | 多角色融合，characterN 指代引用 |
+| **happyhorse-1.0-video-edit** ⭐ | 视频编辑 | 视频 + 文本指令 + 参考图(可选) | 720P/1080P | 3-15s | 风格变换、局部替换、声音控制 |
+
+### Wan 2.7 系列（传统模型）
+
+| 模型 | 功能 | 输入 | 分辨率 | 时长 | 首选场景 |
+|------|------|------|--------|------|---------|
+| **wan2.7-t2v** | 文生视频 | 文本 + 音频(可选) | 720P/1080P | 2-15s | 从零生成视频，支持音频驱动 |
+| **wan2.7-i2v** | 图生视频 | 首帧/首尾帧/首段视频 | 720P/1080P | 2-15s | 图片动起来、过渡、续写 |
+| **wan2.7-videoedit** | 视频编辑 | 视频 + 文本指令 + 参考图(可选) | 720P/1080P | 2-10s | 指令编辑、风格转换、替换 |
 | **wan2.6-r2v-flash** | 参考生视频 | 参考图/视频(最多5个) + 文本 | 720P/1080P | 2-10s | 角色复刻表演 |
 
-> ⚠️ **Wan 2.7 使用 HTTP 调用**，DashScope SDK 暂不支持 wan2.7 模型。
-> ⚠️ Wan 2.7 全系列最高 **1080P**（非 4K），单段最长 **15 秒**。
+> ⚠️ **HappyHorse 1.0 使用异步调用**（创建任务 → 轮询获取），必须设置 `X-DashScope-Async: enable` 请求头。
+> ⚠️ Wan 2.7 使用 HTTP 调用，DashScope SDK 暂不支持 wan2.7 模型。
+> ⚠️ 所有模型最高 **1080P**（非 4K），视频 URL **24 小时**过期。
 
 ---
 
@@ -150,17 +200,214 @@ wan2.6: character1 + 动作/台词 + character2 + 反应 + 环境
 
 ---
 
-## 🎬 视频生成
+## 🎬 HappyHorse 1.0 视频生成
+
+### 通用异步调用流程
+
+HappyHorse 1.0 全部采用异步调用模式：
+
+```
+步骤1: 创建任务（POST）
+POST https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis
+Headers: X-DashScope-Async: enable
+返回: task_id
+
+步骤2: 轮询获取结果（GET）
+GET https://dashscope.aliyuncs.com/api/v1/tasks/{task_id}
+返回: video_url（成功后），有效期 24 小时
+```
+
+### HappyHorse 文生视频（happyhorse-1.0-t2v）
+
+```bash
+# 基础调用
+curl --location 'https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis' \
+    -H 'X-DashScope-Async: enable' \
+    -H "Authorization: Bearer $DASHSCOPE_API_KEY" \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "model": "happyhorse-1.0-t2v",
+    "input": {
+        "prompt": "一座由硬纸板和瓶盖搭建的微型城市，在夜晚焕发出生机。一列硬纸板火车缓缓驶过，小灯点缀其间，照亮前路。"
+    },
+    "parameters": {
+        "resolution": "720P",
+        "ratio": "16:9",
+        "duration": 5
+    }
+}'
+
+# 查询结果
+curl -X GET https://dashscope.aliyuncs.com/api/v1/tasks/{task_id} \
+    --header "Authorization: Bearer $DASHSCOPE_API_KEY"
+```
+
+**参数说明：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| model | string | ✅ | `happyhorse-1.0-t2v` |
+| prompt | string | ✅ | 文本提示词，最长 5000 非中文字符或 2500 中文字符 |
+| resolution | string | ❌ | `720P` 或 `1080P`（默认） |
+| ratio | string | ❌ | `16:9`（默认）/ `9:16` / `1:1` / `4:3` / `3:4` |
+| duration | integer | ❌ | `[3, 15]` 秒，默认 5 |
+| watermark | boolean | ❌ | `true`（默认，添加"Happy Horse"水印）/ `false` |
+| seed | integer | ❌ | `[0, 2147483647]` |
+
+### HappyHorse 图生视频（happyhorse-1.0-i2v）
+
+```bash
+curl --location 'https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis' \
+    -H 'X-DashScope-Async: enable' \
+    -H "Authorization: Bearer $DASHSCOPE_API_KEY" \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "model": "happyhorse-1.0-i2v",
+    "input": {
+        "prompt": "一只猫在草地上奔跑",
+        "media": [
+            {
+                "type": "first_frame",
+                "url": "https://example.com/first-frame.png"
+            }
+        ]
+    },
+    "parameters": {
+        "resolution": "720P",
+        "duration": 5
+    }
+}'
+```
+
+**关键区别 vs Wan 2.7 i2v：**
+- ✅ 只支持首帧（`first_frame`），不支持首尾帧、视频续写
+- ✅ 宽高比**自动跟随输入首帧**，不支持 `ratio` 参数
+- ✅ 输出分辨率自动缩放到与首帧相近的总像素
+- ❌ 不支持音频驱动
+- ✅ 图像限制：JPEG/JPG/PNG/WEBP，宽高≥300px，宽高比 1:2.5~2.5:1，≤10MB
+
+**参数说明：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| model | string | ✅ | `happyhorse-1.0-i2v` |
+| prompt | string | ❌ | 文本引导词，可选 |
+| media[].type | string | ✅ | 固定为 `first_frame` |
+| media[].url | string | ✅ | 首帧图 URL |
+| resolution | string | ❌ | `720P` 或 `1080P`（默认） |
+| duration | integer | ❌ | `[3, 15]` 秒，默认 5 |
+| watermark | boolean | ❌ | `true`（默认）/ `false` |
+| seed | integer | ❌ | `[0, 2147483647]` |
+
+### HappyHorse 参考生视频（happyhorse-1.0-r2v）
+
+```bash
+curl --location 'https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis' \
+    -H 'X-DashScope-Async: enable' \
+    -H "Authorization: Bearer $DASHSCOPE_API_KEY" \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "model": "happyhorse-1.0-r2v",
+    "input": {
+        "prompt": "身着红色旗袍的女性character1，镜头先以侧面中景勾勒旗袍修身剪裁与S型曲线，随即切换至低角度仰拍，捕捉她轻抬玉手展开折扇character2时流苏耳坠character3随头部转动轻盈摆动的细节",
+        "media": [
+            { "type": "reference_image", "url": "https://example.com/girl.jpg" },
+            { "type": "reference_image", "url": "https://example.com/fan.jpg" },
+            { "type": "reference_image", "url": "https://example.com/earrings.jpg" }
+        ]
+    },
+    "parameters": {
+        "resolution": "720P",
+        "ratio": "16:9",
+        "duration": 5
+    }
+}'
+```
+
+**characterN 指代规则：**
+- `character1` 对应 `media[0]`，`character2` 对应 `media[1]`，以此类推
+- 支持 **1-9 张**参考图（vs Wan 2.6 最多 5 张）
+- 图像要求：JPEG/JPG/PNG/WEBP，短边≥400px（推荐 720P+），≤10MB
+
+**参数说明：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| model | string | ✅ | `happyhorse-1.0-r2v` |
+| prompt | string | ✅ | 必须含 characterN 指代 |
+| media[].type | string | ✅ | 固定为 `reference_image` |
+| media[].url | string | ✅ | 参考图 URL（1-9 张） |
+| resolution | string | ❌ | `720P` 或 `1080P`（默认） |
+| ratio | string | ❌ | `16:9`（默认）/ `9:16` / `1:1` / `4:3` / `3:4` |
+| duration | integer | ❌ | `[3, 15]` 秒，默认 5 |
+| watermark | boolean | ❌ | `true`（默认）/ `false` |
+| seed | integer | ❌ | `[0, 2147483647]` |
+
+### HappyHorse 视频编辑（happyhorse-1.0-video-edit）
+
+```bash
+curl --location 'https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis' \
+    -H 'X-DashScope-Async: enable' \
+    -H "Authorization: Bearer $DASHSCOPE_API_KEY" \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "model": "happyhorse-1.0-video-edit",
+    "input": {
+        "prompt": "让视频中的马头人身角色穿上图片中的条纹毛衣",
+        "media": [
+            { "type": "video", "url": "https://example.com/input.mp4" },
+            { "type": "reference_image", "url": "https://example.com/sweater.webp" }
+        ]
+    },
+    "parameters": {
+        "resolution": "720P"
+    }
+}'
+```
+
+**输入视频限制：**
+- 格式：MP4/MOV（建议 H.264 编码）
+- 时长：3-60 秒
+- 分辨率：长边≤2160px，短边≥320px
+- 宽高比：1:2.5~2.5:1
+- 文件大小：≤100MB，帧率>8fps
+
+**输出规则：**
+- 输入≤15s → 输出与输入时长一致
+- 输入>15s → 自动截取前 15 秒作为输出
+
+**声音控制：**
+- `auto`（默认）：模型自行控制
+- `origin`：保留输入视频原始声音
+
+**参数说明：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| model | string | ✅ | `happyhorse-1.0-video-edit` |
+| prompt | string | ✅ | 编辑意图描述 |
+| media[].type | string | ✅ | `video`（必传 1 个）/ `reference_image`（可选 0-5 张） |
+| resolution | string | ❌ | `720P` 或 `1080P`（默认） |
+| watermark | boolean | ❌ | `true`（默认）/ `false` |
+| audio_setting | string | ❌ | `auto`（默认）/ `origin` |
+| seed | integer | ❌ | `[0, 2147483647]` |
+
+---
+
+## 🎬 Wan 2.7 视频生成
+
+> 💡 **图像前置工作流**：推荐先用 Wan 2.7 图像生成（文生图/组图）创建高质量首帧参考图，再使用 HappyHorse i2v 或 Wan 2.7 i2v 生成视频。
+> 完整图像能力请参阅 `aliyun-visual` 技能。
 
 ### 模式选择
 
 ```
-想从零开始生成 → t2v（文生视频）
-有一张图想动起来 → i2v - 首帧生视频
-有首帧和尾帧图 → i2v - 首尾帧生视频
-有已有视频想续写 → i2v - 视频续写
-有参考视频/图复刻角色 → r2v（参考生视频，wan2.6-r2v）
-想编辑已有视频 → videoedit（指令式编辑）
+想从零开始生成 → HappyHorse t2v（文生视频）或 Wan 2.7 t2v
+有一张图想动起来 → HappyHorse i2v（首帧）或 Wan 2.7 i2v
+有首帧和尾帧图 → Wan 2.7 i2v（首尾帧，HappyHorse 不支持）
+有已有视频想续写 → Wan 2.7 i2v（视频续写，HappyHorse 不支持）
+有参考图复刻角色 → HappyHorse r2v（1-9 张参考图）或 Wan 2.6 r2v-flash
+想编辑已有视频 → HappyHorse video-edit（指令+参考图）或 Wan 2.7 videoedit
 ```
 
 ### 文生视频（wan2.7-t2v）
@@ -348,8 +595,20 @@ wan2.6: character1 + 动作/台词 + character2 + 反应 + 环境
 
 ## ⚠️ 注意事项
 
+### HappyHorse 1.0
+- **异步调用**：必须设置 `X-DashScope-Async: enable` 请求头
+- **Task 生命周期**：创建任务 → 轮询（建议 15s 间隔）→ 获取 video_url → 下载（URL 24h 过期）
+- **跨地域限制**：模型、Endpoint URL、API Key 必须属于同一地域（北京/新加坡）
+- **RPS 限制**：查询接口默认 RPS 为 20
+- **Prompt 截断**：超过 5000 非中文字符或 2500 中文字符自动截断
+- **水印**：默认添加 "Happy Horse" 水印，可设 `watermark: false` 关闭
+- **R2V character 指代**：character1 对应 media[0]，最多支持 9 张参考图
+- **i2v 宽高比**：自动跟随首帧，不支持 ratio 参数
+- **video-edit 输出**：输入≤15s 则输出与输入一致，输入>15s 截取前 15s
+
+### Wan 2.7
 - **Wan 2.7 使用 HTTP 调用**，SDK 暂不支持 wan2.7
-- 单段最长 **15 秒**（t2v/i2v），视频编辑最长 **10 秒**
+- 单段最长 **15 秒**（t2v/i2v），视频编辑最长 **10 秒**（Wan 2.7 videoedit）
 - 最高分辨率 **1080P**（非 4K）
 - 所有生成为异步任务，提交后返回 task_id
 - 视频 URL **24 小时**过期，及时下载

@@ -15,8 +15,8 @@ metadata:
 
 # 阿里云百炼文档研究 — 抓取与更新指南
 
-**版本**: v3.0
-**更新时间**: 2026-04-12
+**版本**: v4.0
+**更新时间**: 2026-04-28
 **适用场景**: 抓取阿里云百炼平台最新文档，生成结构化的本地 SKILL.md 文档
 
 ---
@@ -141,6 +141,22 @@ web_fetch(url="https://help.aliyun.com/zh/model-studio/qwen-tts", maxChars=15000
 web_fetch(url="https://help.aliyun.com/zh/model-studio/text-to-image", maxChars=15000)
 web_fetch(url="https://help.aliyun.com/zh/model-studio/batch-interfaces-compatible-with-openai/", maxChars=15000)
 web_fetch(url="https://help.aliyun.com/zh/model-studio/tool-calls", maxChars=15000)
+
+# 🆕 HappyHorse 1.0 视频生成文档（2026-04 新增）
+web_fetch(url="https://help.aliyun.com/zh/model-studio/happyhorse-text-to-video-api-reference", maxChars=20000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/happyhorse-image-to-video-api-reference", maxChars=20000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/happyhorse-reference-to-video-api-reference", maxChars=20000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/happyhorse-video-edit-api-reference", maxChars=20000)
+
+# 🆕 万相 2.7 图像生成与编辑文档
+web_fetch(url="https://help.aliyun.com/zh/model-studio/wan-image-generation-and-editing-api-reference", maxChars=25000)
+
+# 🆕 千问图像文档
+web_fetch(url="https://help.aliyun.com/zh/model-studio/qwen-image-api", maxChars=20000)
+web_fetch(url="https://help.aliyun.com/zh/model-studio/qwen-image-edit-api", maxChars=15000)
+
+# 🆕 Z-Image 文档
+web_fetch(url="https://help.aliyun.com/zh/model-studio/z-image-api-reference", maxChars=15000)
 ```
 
 ### 第 2 步：提取关键信息
@@ -241,13 +257,13 @@ web_fetch(url="https://help.aliyun.com/zh/model-studio/tool-calls", maxChars=150
 
 ---
 
-## 📊 当前文档状态（2026-04-12）
+## 📊 当前文档状态（2026-04-28）
 
 | 类别 | 文件数 | 状态 | 来源 |
 |------|--------|------|------|
 | language-models | 6 | ✅ | text-generation, deep-thinking, context-cache, web-search |
-| video-generation | 18 | ✅ | video-generation, Wan 2.7 API |
-| image-generation | 2 | ✅ | text-to-image |
+| video-generation | 22 | ✅ | video-generation, Wan 2.7 API, **HappyHorse 1.0 全系列** |
+| image-generation | 8 | ✅ | text-to-image, **wan2.7-image-pro, qwen-image-2.0-pro, z-image** |
 | tts | 2 | ✅ | qwen-tts |
 | asr | 2 | ✅ | speech-recognition |
 | embedding | 2 | ✅ | embedding |
@@ -258,4 +274,17 @@ web_fetch(url="https://help.aliyun.com/zh/model-studio/tool-calls", maxChars=150
 | error-codes | 2 | ✅ | error-code |
 | finetuning | 0 | ⚠️ 待补充 | finetuning |
 
-**总计：43 个文件，约 296KB**
+**总计：54 个文件，约 380KB**
+
+### 🆕 v4.0 新增文档（2026-04-28）
+
+| 新文档 | URL | 说明 |
+|--------|-----|------|
+| HappyHorse-文生视频 | happyhorse-text-to-video-api-reference | happyhorse-1.0-t2v |
+| HappyHorse-图生视频 | happyhorse-image-to-video-api-reference | happyhorse-1.0-i2v |
+| HappyHorse-参考生视频 | happyhorse-reference-to-video-api-reference | happyhorse-1.0-r2v |
+| HappyHorse-视频编辑 | happyhorse-video-edit-api-reference | happyhorse-1.0-video-edit |
+| 万相-图像生成与编辑2.7 | wan-image-generation-and-editing-api-reference | wan2.7-image-pro/image |
+| 千问-文生图 | qwen-image-api | qwen-image-2.0-pro/2.0/max/plus |
+| 千问-图像编辑 | qwen-image-edit-api | 独立编辑接口 |
+| Z-Image 文生图 | z-image-api-reference | 轻量快速模型 |
